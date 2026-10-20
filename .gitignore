@@ -1,0 +1,23 @@
+# Môi trường ảo và file tạm của Python
+venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Cấu hình riêng từng máy (có mật khẩu MySQL)
+.env
+.env.example
+
+# Dữ liệu ảnh: lưu trên Google Drive, không đẩy lên GitHub
+data/
+*.zip
+
+# Ảnh người dùng tải lên khi chạy web (vẫn giữ thư mục rỗng)
+app/static/uploads/*
+!app/static/uploads/.gitkeep
+
+# File của hệ điều hành và VS Code
+Thumbs.db
+.DS_Store
+.vscode/
+.claude/settings.local.json

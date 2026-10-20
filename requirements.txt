@@ -1,0 +1,16 @@
+tensorflow==2.21.0     # ĐỔI thành đúng phiên bản của Colab
+numpy
+Pillow
+matplotlib
+scikit-learn
+jupyter
+
+flask
+flask-sqlalchemy
+pymysql
+cryptography           # PyMySQL cần gói này để đăng nhập MySQL 8
+python-dotenv          # đọc file .env
+
+icrawler               # phần thu thập dữ liệu
+opencv-python
+imagehash

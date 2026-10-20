@@ -1,0 +1,27 @@
+{
+  "version": "v0-mau",
+  "trained_at": "chưa train",
+  "img_size": [180, 180],
+  "class_names": ["daisy", "dandelion", "roses", "sunflowers", "tulips"],
+  "num_images": {
+    "daisy": 633,
+    "dandelion": 898,
+    "roses": 641,
+    "sunflowers": 699,
+    "tulips": 799
+  },
+  "test_accuracy": 0.78,
+  "per_class": {
+    "daisy":      {"precision": 0.80, "recall": 0.76, "f1": 0.78},
+    "dandelion":  {"precision": 0.85, "recall": 0.88, "f1": 0.86},
+    "roses":      {"precision": 0.70, "recall": 0.68, "f1": 0.69},
+    "sunflowers": {"precision": 0.82, "recall": 0.84, "f1": 0.83},
+    "tulips":     {"precision": 0.72, "recall": 0.74, "f1": 0.73}
+  },
+  "uncertain_threshold": 0.5,
+  "charts": {
+    "training_curves": "/static/model/training_curves.png",
+    "confusion_matrix": "/static/model/confusion_matrix.png"
+  },
+  "comparison": []
+}
