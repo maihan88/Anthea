@@ -1,1 +1,129 @@
 <!-- Thông tin các loài hoa. Người phụ trách: Nghi -->
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Thư viện hoa · Anthea</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon.png') }}">
+</head>
+<body>
+  <!-- ============ HEADER ============ -->
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="/" aria-label="Anthea – trang chủ">
+        <img class="brand-logo" src="{{ url_for('static', filename='img/logo.png') }}" alt="" aria-hidden="true">
+        <span class="brand-name">Anthea</span>
+      </a>
+      <nav class="main-nav" aria-label="Chính">
+        <a href="/">Trang chủ</a>
+        <a href="/identify">Nhận diện</a>
+        <a href="/flowers" class="active" aria-current="page">Thư viện hoa</a>
+        <a href="/history">Lịch sử</a>
+        <a href="/model">Mô hình</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============ DANH SÁCH LOÀI (mặc định) ============ -->
+    <section id="listView" class="wrap d-flex flex-column" style="padding-top:56px;padding-bottom:80px;gap:36px">
+      <div class="d-flex justify-content-between align-items-end flex-wrap" style="gap:24px">
+        <div class="d-flex flex-column gap-2">
+          <span class="eyebrow">Thư viện</span>
+          <h1 class="page-title">Những loài hoa <em>Anthea biết</em></h1>
+        </div>
+      </div>
+
+      <div id="flowerGrid" class="row g-4">
+        <div class="col-sm-6 col-lg-4 col-xl-3">
+          <a class="flower-card" href="/flowers/1">
+            <span class="flower-thumb stripe" style="--h:140">
+              <span class="ph-label">[ Ảnh cúc họa mi ]</span>
+              <span class="flower-badge">971 ảnh</span>
+            </span>
+            <span class="flower-meta">
+              <span class="d-flex flex-column gap-1"><span class="flower-vi">Cúc họa mi</span><span class="flower-en">Daisy</span></span>
+              <span class="dot" style="--h:140" aria-hidden="true"></span>
+            </span>
+          </a>
+        </div>
+        <div class="col-sm-6 col-lg-4 col-xl-3">
+          <a class="flower-card" href="/flowers/2">
+            <span class="flower-thumb stripe" style="--h:60">
+              <span class="ph-label">[ Ảnh bồ công anh ]</span>
+              <span class="flower-badge">1.222 ảnh</span>
+            </span>
+            <span class="flower-meta">
+              <span class="d-flex flex-column gap-1"><span class="flower-vi">Bồ công anh</span><span class="flower-en">Dandelion</span></span>
+              <span class="dot" style="--h:60" aria-hidden="true"></span>
+            </span>
+          </a>
+        </div>
+        <div class="col-sm-6 col-lg-4 col-xl-3">
+          <a class="flower-card" href="/flowers/3">
+            <span class="flower-thumb stripe" style="--h:10">
+              <span class="ph-label">[ Ảnh hoa hồng ]</span>
+              <span class="flower-badge">1.053 ảnh</span>
+            </span>
+            <span class="flower-meta">
+              <span class="d-flex flex-column gap-1"><span class="flower-vi">Hoa hồng</span><span class="flower-en">Rose</span></span>
+              <span class="dot" style="--h:10" aria-hidden="true"></span>
+            </span>
+          </a>
+        </div>
+        <div class="col-sm-6 col-lg-4 col-xl-3">
+          <a class="flower-card" href="/flowers/4">
+            <span class="flower-thumb stripe" style="--h:85">
+              <span class="ph-label">[ Ảnh hướng dương ]</span>
+              <span class="flower-badge">1.055 ảnh</span>
+            </span>
+            <span class="flower-meta">
+              <span class="d-flex flex-column gap-1"><span class="flower-vi">Hướng dương</span><span class="flower-en">Sunflower</span></span>
+              <span class="dot" style="--h:85" aria-hidden="true"></span>
+            </span>
+          </a>
+        </div>
+        <div class="col-sm-6 col-lg-4 col-xl-3">
+          <a class="flower-card" href="/flowers/5">
+            <span class="flower-thumb stripe" style="--h:345">
+              <span class="ph-label">[ Ảnh tulip ]</span>
+              <span class="flower-badge">1.170 ảnh</span>
+            </span>
+            <span class="flower-meta">
+              <span class="d-flex flex-column gap-1"><span class="flower-vi">Tulip</span><span class="flower-en">Tulip</span></span>
+              <span class="dot" style="--h:345" aria-hidden="true"></span>
+            </span>
+          </a>
+        </div>
+        <!-- Hoa sen: mở rộng nếu còn thời gian -->
+        <div class="col-sm-6 col-lg-4 col-xl-3">
+          <div class="flower-card soon" aria-disabled="true">
+            <span class="flower-thumb stripe" style="--h:5">
+              <span class="ph-label">[ Ảnh hoa sen ]</span>
+              <span class="flower-badge">Sắp có</span>
+            </span>
+            <span class="flower-meta">
+              <span class="d-flex flex-column gap-1"><span class="flower-vi">Hoa sen</span><span class="flower-en">Lotus</span></span>
+              <span class="dot" style="--h:5" aria-hidden="true"></span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="site-footer">
+    <div class="wrap">
+      <span><em>Anthea</em> — nhận diện hoa bằng CNN</span>
+      <span class="mono" style="font-size:12px">TensorFlow · Keras · Flask · MySQL</span>
+    </div>
+  </footer>
+</body>
+</html>
