@@ -1,0 +1,74 @@
+<!-- Chi tiết một loài hoa (/flowers/<id>). Người phụ trách: Nghi -->
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hoa hồng · Anthea</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon.png') }}">
+</head>
+<body>
+  <!-- ============ HEADER ============ -->
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="/" aria-label="Anthea – trang chủ">
+        <img class="brand-logo" src="{{ url_for('static', filename='img/logo.png') }}" alt="" aria-hidden="true">
+        <span class="brand-name">Anthea</span>
+      </a>
+      <nav class="main-nav" aria-label="Chính">
+        <a href="/">Trang chủ</a>
+        <a href="/identify">Nhận diện</a>
+        <a href="/flowers" class="active" aria-current="page">Thư viện hoa</a>
+        <a href="/history">Lịch sử</a>
+        <a href="/model">Mô hình</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============ CHI TIẾT LOÀI (theo bản gốc) ============ -->
+    <section class="wrap d-flex flex-column" style="padding-top:30px;padding-bottom:80px;gap:16px">
+      <a class="back-link" href="/flowers">← Tất cả loài hoa</a>
+      <div class="row g-4 g-lg-5 align-items-start">
+        <div class="col-lg-6">
+          <div class="detail-gallery">
+            <div class="stripe" style="--h:10"><span class="ph-label">[ Ảnh hoa hồng ]</span></div>
+            <div class="stripe" style="--h:10"><span class="ph-label">[ ảnh mẫu dataset ]</span></div>
+            <div class="stripe" style="--h:10"><span class="ph-label">[ ảnh mẫu dataset ]</span></div>
+          </div>
+        </div>
+        <div class="col-lg-6 d-flex flex-column" style="gap:26px">
+          <div class="d-flex flex-column gap-2">
+            <div class="d-flex align-items-center gap-2">
+              <span class="dot" style="--h:10;width:10px;height:10px" aria-hidden="true"></span>
+              <span class="detail-sci">Rosa spp.</span>
+            </div>
+            <h1 class="detail-title">Hoa hồng</h1>
+            <div class="detail-en">Rose</div>
+          </div>
+          <dl class="info-rows">
+            <div><dt>Đặc điểm nhận biết</dt><dd>Cánh hoa xếp nhiều lớp xoắn quanh tâm, thân có gai, lá kép với mép răng cưa.</dd></div>
+            <div><dt>Ý nghĩa</dt><dd>Tình yêu, sự trân trọng và lòng biết ơn.</dd></div>
+            <div><dt>Mùa ra hoa</dt><dd>Quanh năm, rộ nhất vào mùa xuân</dd></div>
+            <div><dt>Dữ liệu huấn luyện</dt><dd class="mono" style="font-size:14px">641 ảnh TF Flowers + 412 ảnh tự thu thập</dd></div>
+          </dl>
+          <a class="btn btn-forest align-self-start" href="/identify">Nhận diện một bông hồng</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="site-footer">
+    <div class="wrap">
+      <span><em>Anthea</em> — nhận diện hoa bằng CNN</span>
+      <span class="mono" style="font-size:12px">TensorFlow · Keras · Flask · MySQL</span>
+    </div>
+  </footer>
+</body>
+</html>

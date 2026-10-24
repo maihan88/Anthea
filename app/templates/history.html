@@ -1,1 +1,202 @@
 <!-- Lịch sử dự đoán. Người phụ trách: Nghi -->
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lịch sử · Anthea</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon.png') }}">
+</head>
+<body>
+  <!-- ============ HEADER ============ -->
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="/" aria-label="Anthea – trang chủ">
+        <img class="brand-logo" src="{{ url_for('static', filename='img/logo.png') }}" alt="" aria-hidden="true">
+        <span class="brand-name">Anthea</span>
+      </a>
+      <nav class="main-nav" aria-label="Chính">
+        <a href="/">Trang chủ</a>
+        <a href="/identify">Nhận diện</a>
+        <a href="/flowers">Thư viện hoa</a>
+        <a href="/history" class="active" aria-current="page">Lịch sử</a>
+        <a href="/model">Mô hình</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="d-flex flex-column mx-auto" style="max-width:1100px;padding:56px 24px 80px;gap:28px">
+      <div class="d-flex justify-content-between align-items-end flex-wrap" style="gap:20px">
+        <div class="d-flex flex-column gap-2">
+          <span id="countLabel" class="eyebrow" style="font-weight:600;color:var(--ink-3)">4 lần phân loại</span>
+          <h1 class="page-title" style="font-size:clamp(40px,5vw,62px)">Nhật ký <em>vườn hoa</em></h1>
+        </div>
+        <button id="btnClearAll" type="button" class="btn btn-del-all">Xóa toàn bộ</button>
+      </div>
+
+      <!-- ============ BẢNG LỊCH SỬ ============ -->
+      <div id="historyWrap" class="history-card">
+        <div class="table-responsive">
+          <table class="table table-hover history-table">
+            <thead>
+              <tr>
+                <th scope="col">Ảnh</th>
+                <th scope="col">Loài hoa</th>
+                <th scope="col">Độ tin cậy</th>
+                <th scope="col">Thời gian</th>
+                <th scope="col"><span class="visually-hidden">Thao tác</span></th>
+              </tr>
+            </thead>
+            <tbody id="historyBody">
+              <tr>
+                <td style="width:88px"><div class="history-thumb stripe" style="--h:10"></div></td>
+                <td>
+                  <div class="d-flex align-items-center flex-wrap" style="gap:10px"><span class="history-name">Hoa hồng</span></div>
+                  <div class="history-file">hoa-hong-ban-cong.jpg</div>
+                </td>
+                <td style="width:200px">
+                  <div class="d-flex align-items-center" style="gap:10px">
+                    <div class="conf-track" aria-hidden="true"><div class="conf-fill" style="width:87.3%"></div></div>
+                    <span class="mono" style="font-size:13px">87,3%</span>
+                  </div>
+                </td>
+                <td class="history-time">21/10/2026 22:38</td>
+                <td class="text-end" style="width:120px">
+                  <div class="d-inline-flex gap-2">
+                  <a class="btn-view-one" href="/history/12" aria-label="Xem chi tiết Hoa hồng lúc 21/10/2026 22:38">
+                    <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+                  </a>
+                  <button type="button" class="btn-del-one" data-id="12" aria-label="Xóa mục Hoa hồng lúc 21/10/2026 22:38">
+                    <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M6 7l1 13h10l1-13"/></svg>
+                  </button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td style="width:88px"><div class="history-thumb stripe" style="--h:85"></div></td>
+                <td>
+                  <div class="d-flex align-items-center flex-wrap" style="gap:10px"><span class="history-name">Hướng dương</span></div>
+                  <div class="history-file">IMG_2041.jpg</div>
+                </td>
+                <td style="width:200px">
+                  <div class="d-flex align-items-center" style="gap:10px">
+                    <div class="conf-track" aria-hidden="true"><div class="conf-fill" style="width:93%"></div></div>
+                    <span class="mono" style="font-size:13px">93,0%</span>
+                  </div>
+                </td>
+                <td class="history-time">21/10/2026 21:05</td>
+                <td class="text-end" style="width:120px">
+                  <div class="d-inline-flex gap-2">
+                  <a class="btn-view-one" href="/history/11" aria-label="Xem chi tiết Hướng dương lúc 21/10/2026 21:05">
+                    <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+                  </a>
+                  <button type="button" class="btn-del-one" data-id="11" aria-label="Xóa mục Hướng dương lúc 21/10/2026 21:05">
+                    <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M6 7l1 13h10l1-13"/></svg>
+                  </button>
+                  </div>
+                </td>
+              </tr>
+              <!-- Ví dụ mục "Chưa chắc chắn": độ tin cậy dưới 50% -->
+              <tr>
+                <td style="width:88px"><div class="history-thumb stripe" style="--h:345"></div></td>
+                <td>
+                  <div class="d-flex align-items-center flex-wrap" style="gap:10px">
+                    <span class="history-name">Tulip</span>
+                    <span class="badge-unsure">Chưa chắc chắn</span>
+                  </div>
+                  <div class="history-file">hoa-cua-me.png</div>
+                </td>
+                <td style="width:200px">
+                  <div class="d-flex align-items-center" style="gap:10px">
+                    <div class="conf-track" aria-hidden="true"><div class="conf-fill low" style="width:41.3%"></div></div>
+                    <span class="mono" style="font-size:13px">41,3%</span>
+                  </div>
+                </td>
+                <td class="history-time">20/10/2026 16:12</td>
+                <td class="text-end" style="width:120px">
+                  <div class="d-inline-flex gap-2">
+                  <a class="btn-view-one" href="/history/10" aria-label="Xem chi tiết Tulip lúc 20/10/2026 16:12">
+                    <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+                  </a>
+                  <button type="button" class="btn-del-one" data-id="10" aria-label="Xóa mục Tulip lúc 20/10/2026 16:12">
+                    <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M6 7l1 13h10l1-13"/></svg>
+                  </button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td style="width:88px"><div class="history-thumb stripe" style="--h:140"></div></td>
+                <td>
+                  <div class="d-flex align-items-center flex-wrap" style="gap:10px"><span class="history-name">Cúc họa mi</span></div>
+                  <div class="history-file">cuc-hoa-mi-ho-tay.jpg</div>
+                </td>
+                <td style="width:200px">
+                  <div class="d-flex align-items-center" style="gap:10px">
+                    <div class="conf-track" aria-hidden="true"><div class="conf-fill" style="width:91.1%"></div></div>
+                    <span class="mono" style="font-size:13px">91,1%</span>
+                  </div>
+                </td>
+                <td class="history-time">20/10/2026 09:47</td>
+                <td class="text-end" style="width:120px">
+                  <div class="d-inline-flex gap-2">
+                  <a class="btn-view-one" href="/history/9" aria-label="Xem chi tiết Cúc họa mi lúc 20/10/2026 09:47">
+                    <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+                  </a>
+                  <button type="button" class="btn-del-one" data-id="9" aria-label="Xóa mục Cúc họa mi lúc 20/10/2026 09:47">
+                    <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M6 7l1 13h10l1-13"/></svg>
+                  </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ============ CHƯA CÓ LỊCH SỬ (hiện khi danh sách trống) ============ -->
+      <div id="emptyState" class="empty-state d-none">
+        <svg aria-hidden="true" viewBox="0 0 200 200" width="72" height="72">
+          <g fill="none" stroke="#2f4a37" stroke-opacity=".55" stroke-width="5">
+            <ellipse cx="100" cy="56" rx="24" ry="44"/>
+            <ellipse cx="100" cy="56" rx="24" ry="44" transform="rotate(72 100 100)"/>
+            <ellipse cx="100" cy="56" rx="24" ry="44" transform="rotate(144 100 100)"/>
+            <ellipse cx="100" cy="56" rx="24" ry="44" transform="rotate(216 100 100)"/>
+            <ellipse cx="100" cy="56" rx="24" ry="44" transform="rotate(288 100 100)"/>
+          </g>
+        </svg>
+        <h2>Chưa có lịch sử phân loại</h2>
+        <p>Mỗi lần bạn phân loại một ảnh, kết quả sẽ được lưu ở đây.</p>
+        <a class="btn btn-forest mt-1" href="/identify">Sang trang Phân loại</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ HỘP XÁC NHẬN XÓA (Bootstrap modal, JS sẽ mở) ============ -->
+  <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:440px">
+      <div class="modal-content anthea-modal">
+        <h2 id="confirmTitle">Xóa mục này?</h2>
+        <p id="confirmText">Kết quả “Tulip” lúc 20/10/2026 16:12 và ảnh đã tải lên sẽ bị xóa. Không thể hoàn tác.</p>
+        <div class="d-flex justify-content-end flex-wrap gap-2 mt-4">
+          <button type="button" class="btn btn-line" data-bs-dismiss="modal">Hủy</button>
+          <button id="btnConfirm" type="button" class="btn btn-danger-anthea">Xóa</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="site-footer">
+    <div class="wrap">
+      <span><em>Anthea</em> — nhận diện hoa bằng CNN</span>
+      <span class="mono" style="font-size:12px">TensorFlow · Keras · Flask · MySQL</span>
+    </div>
+  </footer>
+</body>
+</html>

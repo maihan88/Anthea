@@ -1,1 +1,165 @@
-<!-- Trang chủ: tải ảnh lên để nhận dạng. Người phụ trách: Nghi -->
+<!-- Trang chủ. Người phụ trách: Nghi -->
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Trang chủ · Anthea</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon.png') }}">
+</head>
+<body>
+  <!-- ============ HEADER ============ -->
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="/" aria-label="Anthea – trang chủ">
+        <img class="brand-logo" src="{{ url_for('static', filename='img/logo.png') }}" alt="" aria-hidden="true">
+        <span class="brand-name">Anthea</span>
+      </a>
+      <nav class="main-nav" aria-label="Chính">
+        <a href="/" class="active" aria-current="page">Trang chủ</a>
+        <a href="/identify">Nhận diện</a>
+        <a href="/flowers">Thư viện hoa</a>
+        <a href="/history">Lịch sử</a>
+        <a href="/model">Mô hình</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============ HERO ============ -->
+    <section class="hero">
+      <div class="hero-blob-1" aria-hidden="true"></div>
+      <div class="wrap">
+        <div class="row g-4 g-lg-5 align-items-center">
+
+          <!-- Cột trái: giới thiệu -->
+          <div class="col-lg-6">
+            <div class="hero-copy">
+              <span class="hero-pill">Nhận diện loài hoa bằng học sâu</span>
+              <h1 class="hero-title">Mỗi bông hoa đều có <em>một cái tên</em>.</h1>
+              <p class="hero-lead">Chụp hoặc tải lên một tấm ảnh — Anthea cho bạn biết đó là loài hoa gì, kèm độ tin cậy, ý nghĩa và mùa nở của nó.</p>
+              <div class="d-flex flex-wrap gap-2">
+                <a class="btn btn-forest btn-lg-pill" href="/identify">Bắt đầu nhận diện →</a>
+                <a class="btn btn-line btn-lg-pill" href="/flowers">Khám phá thư viện</a>
+              </div>
+              <div class="d-flex flex-column gap-2" style="padding-top:8px">
+                <span class="eyebrow">Anthea đang nhận ra</span>
+                <div class="d-flex flex-wrap gap-2">
+                  <a class="chip" href="/flowers/3"><span class="dot" style="--h:10"></span>Hoa hồng</a>
+                  <a class="chip" href="/flowers/4"><span class="dot" style="--h:85"></span>Hướng dương</a>
+                  <a class="chip" href="/flowers/1"><span class="dot" style="--h:140"></span>Cúc họa mi</a>
+                  <a class="chip" href="/flowers/5"><span class="dot" style="--h:345"></span>Tulip</a>
+                  <a class="chip" href="/flowers/2"><span class="dot" style="--h:60"></span>Bồ công anh</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cột phải: cụm ảnh + thẻ kết quả mẫu -->
+          <div class="col-lg-6">
+            <div class="hero-visual">
+              <div class="hero-collage">
+                <div class="stripe" style="--h:85"><span class="ph-label">[ Ảnh hoa chủ đạo ]</span></div>
+                <div class="stripe" style="--h:345"><span class="ph-label">[ Ảnh hoa phụ ]</span></div>
+                <div class="stripe" style="--h:140"><span class="ph-label">[ Ảnh hoa phụ ]</span></div>
+              </div>
+              <div class="hero-result" aria-hidden="true">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="dot" style="--h:85;width:8px;height:8px"></span>
+                  <span class="eyebrow" style="font-size:11px">Kết quả nhận diện</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-baseline gap-2">
+                  <span class="hero-result-name">Hướng dương</span>
+                  <span class="hero-result-pct">93%</span>
+                </div>
+                <div class="metric-track"><div style="width:93%"></div></div>
+                <span class="mono" style="font-size:11px;color:var(--ink-5)">IMG_2041.jpg · 1,4 giây</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ BA BƯỚC ============ -->
+    <section class="wrap" style="padding-top:8px;padding-bottom:72px">
+      <div class="steps-head">
+        <h2>Ba bước, vài giây</h2>
+        <a href="/model">Tìm hiểu mô hình →</a>
+      </div>
+      <div class="row g-3">
+        <div class="col-md-4">
+          <div class="step-card"><span class="num">01</span><h3>Tải ảnh lên</h3><p>Vào trang Nhận diện, kéo-thả hoặc chọn ảnh JPG, PNG và xem trước trước khi gửi.</p></div>
+        </div>
+        <div class="col-md-4">
+          <div class="step-card"><span class="num">02</span><h3>CNN phân tích</h3><p>Ảnh được đưa về 180×180 px; mạng tích chập học hình dáng cánh, nhụy và màu sắc.</p></div>
+        </div>
+        <div class="col-md-4">
+          <div class="step-card accent"><span class="num">03</span><h3>Nhận kết quả</h3><p>Tên loài, độ tin cậy, top 3 dự đoán — và mọi lần phân loại được lưu vào lịch sử.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ NHẬN DIỆN GẦN ĐÂY (3 mục mới nhất; ẩn khi lịch sử trống) ============ -->
+    <section id="recentSection" class="wrap" style="padding-bottom:88px">
+      <div class="steps-head">
+        <h2>Nhận diện gần đây</h2>
+        <a href="/history">Xem toàn bộ lịch sử →</a>
+      </div>
+      <div id="recentList" class="row g-3">
+        <div class="col-md-6 col-lg-4 col-xl-3">
+          <a class="recent-card" href="/history/12">
+            <span class="recent-thumb stripe" style="--h:10"></span>
+            <span class="recent-meta">
+              <span class="d-flex flex-column gap-1" style="min-width:0">
+                <span class="recent-name">Hoa hồng</span>
+                <span class="recent-time">21/10 · 22:38</span>
+              </span>
+              <span class="recent-pct">87%</span>
+            </span>
+          </a>
+        </div>
+        <div class="col-md-6 col-lg-4 col-xl-3">
+          <a class="recent-card" href="/history/11">
+            <span class="recent-thumb stripe" style="--h:85"></span>
+            <span class="recent-meta">
+              <span class="d-flex flex-column gap-1" style="min-width:0">
+                <span class="recent-name">Hướng dương</span>
+                <span class="recent-time">21/10 · 21:05</span>
+              </span>
+              <span class="recent-pct">93%</span>
+            </span>
+          </a>
+        </div>
+        <div class="col-md-6 col-lg-4 col-xl-3">
+          <a class="recent-card" href="/history/10">
+            <span class="recent-thumb stripe" style="--h:345"></span>
+            <span class="recent-meta">
+              <span class="d-flex flex-column gap-1" style="min-width:0">
+                <span class="recent-name">Tulip</span>
+                <span class="recent-time">20/10 · 16:12</span>
+              </span>
+              <!-- Dưới ngưỡng: thêm class "low" -->
+              <span class="recent-pct low">41%</span>
+            </span>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="site-footer">
+    <div class="wrap">
+      <span><em>Anthea</em> — nhận diện hoa bằng CNN</span>
+      <span class="mono" style="font-size:12px">TensorFlow · Keras · Flask · MySQL</span>
+    </div>
+  </footer>
+</body>
+</html>
