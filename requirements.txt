@@ -1,4 +1,4 @@
-tensorflow==2.21.0     # ĐỔI thành đúng phiên bản của Colab
+tensorflow==2.21.0     # đúng phiên bản Colab đã train mô hình, không tự đổi
 numpy
 Pillow
 matplotlib

@@ -60,7 +60,7 @@ TensorFlow nặng vài trăm MB, nên dùng mạng ổn định. `requirements.t
 Copy-Item .env.example .env
 ```
 
-Mở `.env`, điền `DB_PASSWORD` là mật khẩu MySQL `root` trên máy bạn. Giữ `USE_FAKE_MODEL=1` (mô hình giả) cho đến khi có mô hình thật; từ buổi ghép 25/10 đổi thành `0`.
+Mở `.env`, điền `DB_PASSWORD` là mật khẩu MySQL `root` trên máy bạn. Giữ `USE_FAKE_MODEL=0` để web dùng mô hình thật `models/flower_cnn.keras`.
 
 File `.env` chứa mật khẩu nên **không bao giờ đẩy lên GitHub** (đã có trong `.gitignore`).
 
@@ -78,7 +78,7 @@ Cài đặt xong khi lệnh in ra 3 loài kèm độ tin cậy, ví dụ:
 [{'code': 'tulips', 'confidence': 0.4167}, {'code': 'roses', 'confidence': 0.1687}, {'code': 'dandelion', 'confidence': 0.1522}]
 ```
 
-Khi `USE_FAKE_MODEL=1`, các con số là ngẫu nhiên (cùng một ảnh luôn ra cùng kết quả), không phải mô hình đoán thật, nên loài đứng đầu có thể sai. Thử xong thì xóa `anh_thu.jpg`, không commit.
+Lần chạy đầu mất vài giây để nạp mô hình. Thử xong thì xóa `anh_thu.jpg`, không commit.
 
 ### Lỗi thường gặp
 
