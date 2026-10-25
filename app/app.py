@@ -1,49 +1,22 @@
 """Flask: các trang + REST API.
 Người phụ trách: Nghi
 """
-from flask import Flask, jsonify, render_template, request
+import uuid
 
+from flask import Flask, jsonify, render_template, request, url_for
+from sqlalchemy.exc import SQLAlchemyError
+
+import config
 import model_service
+from database import Flower, Prediction, PredictionScore, db
 
 app = Flask(__name__)
+app.config.from_object(config)
 app.config["MAX_CONTENT_LENGTH"] = 6 * 1024 * 1024    # chặn request quá lớn (ảnh 5 MB + phần đầu multipart)
+db.init_app(app)
 
 MAX_IMAGE_BYTES = 5 * 1024 * 1024
-ALLOWED_TYPES = {"image/jpeg", "image/png"}
-
-# Thông tin 5 loài (lấy đúng chữ trong bản thiết kế) – TẠM để ở đây, thay bằng bảng flowers khi có database
-FLOWERS = {
-    "daisy": {
-        "id": 1, "name_vi": "Cúc họa mi", "name_en": "Daisy", "scientific": "Bellis perennis", "hue": 140,
-        "description": "Cánh trắng mảnh, xếp một vòng quanh nhụy vàng tròn ở giữa.",
-        "meaning": "Sự ngây thơ, trong sáng và khởi đầu mới.",
-        "season": "Cuối thu – đầu đông",
-    },
-    "dandelion": {
-        "id": 2, "name_vi": "Bồ công anh", "name_en": "Dandelion", "scientific": "Taraxacum officinale", "hue": 60,
-        "description": "Hoa vàng gồm nhiều cánh nhỏ li ti; khi già kết thành quả cầu lông trắng.",
-        "meaning": "Hy vọng, ước nguyện và sự tự do.",
-        "season": "Mùa xuân – hè",
-    },
-    "roses": {
-        "id": 3, "name_vi": "Hoa hồng", "name_en": "Rose", "scientific": "Rosa spp.", "hue": 10,
-        "description": "Cánh hoa xếp nhiều lớp xoắn quanh tâm, thân có gai, lá kép với mép răng cưa.",
-        "meaning": "Tình yêu, sự trân trọng và lòng biết ơn.",
-        "season": "Quanh năm, rộ nhất vào mùa xuân",
-    },
-    "sunflowers": {
-        "id": 4, "name_vi": "Hướng dương", "name_en": "Sunflower", "scientific": "Helianthus annuus", "hue": 85,
-        "description": "Đĩa hoa lớn màu nâu ở giữa, cánh vàng tỏa tròn, thân cao và cứng.",
-        "meaning": "Niềm tin, sự lạc quan, luôn hướng về ánh sáng.",
-        "season": "Mùa hè đến đầu thu",
-    },
-    "tulips": {
-        "id": 5, "name_vi": "Tulip", "name_en": "Tulip", "scientific": "Tulipa", "hue": 345,
-        "description": "Hoa hình chén với 6 cánh, thân thẳng, lá dài hình mũi mác.",
-        "meaning": "Tình yêu hoàn hảo, sự sung túc.",
-        "season": "Mùa xuân",
-    },
-}
+ALLOWED_TYPES = {"image/jpeg": ".jpg", "image/png": ".png"}   # kiểu ảnh → đuôi file khi lưu
 
 
 @app.route("/")
@@ -97,12 +70,39 @@ def api_predict():
     except ValueError as e:
         return jsonify(error=f"{e}."), 400
 
-    threshold = model_service.get_model_info()["uncertain_threshold"]
+    info = model_service.get_model_info()
+    threshold = info["uncertain_threshold"]
+    # Tên file ngẫu nhiên (uuid4): không trùng, không có ký tự lạ hay "../"; tên gốc chỉ lưu vào CSDL
+    image_file = config.UPLOAD_DIR / (uuid.uuid4().hex + ALLOWED_TYPES[file.mimetype])
+    try:
+        codes = [p["code"] for p in top]
+        flowers = {f.code: f for f in db.session.scalars(db.select(Flower).where(Flower.code.in_(codes)))}
+        if len(flowers) < len(codes):
+            return jsonify(error="CSDL chưa có đủ thông tin loài hoa — chạy python app/seed.py."), 500
+        image_file.write_bytes(image_bytes)
+        # 1 dòng predictions + 3 dòng prediction_scores trong cùng một lần commit: lỗi thì không dòng nào được ghi
+        prediction = Prediction(
+            flower=flowers[top[0]["code"]], confidence=top[0]["confidence"],
+            image_path=f"uploads/{image_file.name}", original_name=file.filename[:255],
+            file_size=len(image_bytes), model_version=info["version"], threshold=threshold,
+            scores=[PredictionScore(ranking=i, flower=flowers[p["code"]], confidence=p["confidence"])
+                    for i, p in enumerate(top, start=1)],
+        )
+        db.session.add(prediction)
+        db.session.commit()
+    except SQLAlchemyError:
+        db.session.rollback()
+        image_file.unlink(missing_ok=True)
+        app.logger.exception("Không lưu được lịch sử phân loại")
+        return jsonify(error="Không lưu được lịch sử — kiểm tra MySQL đã chạy chưa."), 500
+
     return jsonify(
-        top=[{**FLOWERS[p["code"]], **p} for p in top],
+        top=[{**flowers[p["code"]].to_dict(), **p} for p in top],
         threshold=threshold,
         uncertain=top[0]["confidence"] < threshold,
-        history_id=None,                              # chưa có bảng predictions nên chưa lưu lịch sử
+        history_id=prediction.id,
+        image_url=url_for("static", filename=prediction.image_path),
+        created_at=prediction.created_at.isoformat(timespec="seconds"),
     )
 
 
