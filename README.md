@@ -60,7 +60,7 @@ TensorFlow nặng vài trăm MB, nên dùng mạng ổn định. `requirements.t
 Copy-Item .env.example .env
 ```
 
-Mở `.env`, điền `DB_PASSWORD` là mật khẩu MySQL `root` trên máy bạn. Giữ `USE_FAKE_MODEL=0` để web dùng mô hình thật `models/flower_cnn.keras`.
+Mở `.env`, điền `DB_USER` và `DB_PASSWORD` là tài khoản MySQL tạo ở mục **Chạy web** bước 1 (không dùng `root`). Giữ `USE_FAKE_MODEL=0` để web dùng mô hình thật `models/flower_cnn.keras`.
 
 File `.env` chứa mật khẩu nên **không bao giờ đẩy lên GitHub** (đã có trong `.gitignore`).
 
@@ -92,4 +92,32 @@ Lần chạy đầu mất vài giây để nạp mô hình. Thử xong thì xóa
 
 ## Chạy web
 
-<!-- Nghi viết: tạo database, python app/seed.py, python app/app.py -->
+Cần MySQL 8.4 đang chạy (dịch vụ `MySQL84`) và file `.env` đã điền.
+
+### 1. Tạo database và tài khoản cho app (mỗi máy làm một lần)
+
+Mở MySQL Workbench bằng tài khoản `root`, chạy (đổi mật khẩu):
+
+```sql
+CREATE DATABASE flower_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'anthea'@'localhost' IDENTIFIED BY 'doi_mat_khau_nay';
+GRANT ALL PRIVILEGES ON flower_db.* TO 'anthea'@'localhost';
+```
+
+Điền `DB_USER=anthea` và mật khẩu vừa đặt vào `.env`.
+
+### 2. Tạo bảng và dữ liệu loài hoa
+
+```powershell
+python app/seed.py
+```
+
+Chạy lại bao nhiêu lần cũng được. Mỗi máy một CSDL riêng: lịch sử phân loại không đồng bộ giữa hai máy.
+
+### 3. Chạy web
+
+```powershell
+python app/app.py
+```
+
+Mở http://127.0.0.1:5000.
