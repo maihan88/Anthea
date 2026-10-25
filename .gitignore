@@ -6,7 +6,6 @@ __pycache__/
 
 # Cấu hình riêng từng máy (có mật khẩu MySQL)
 .env
-.env.example
 
 # Dữ liệu ảnh: lưu trên Google Drive, không đẩy lên GitHub
 data/
