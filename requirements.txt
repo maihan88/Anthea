@@ -11,6 +11,8 @@ pymysql
 cryptography           # PyMySQL cần gói này để đăng nhập MySQL 8
 python-dotenv          # đọc file .env
 
-icrawler               # phần thu thập dữ liệu
+requests               # tải ảnh từ iNaturalist (phần thu thập dữ liệu)
+torch                  # chạy CLIP để sàng lọc ảnh (screen.py)
+transformers           # tải và dùng mô hình CLIP
 opencv-python
 imagehash

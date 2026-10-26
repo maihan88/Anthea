@@ -1,1 +1,18 @@
-{}
+{
+  "daisy": [
+    {"name": "Bellis perennis", "taxon_id": 55563, "max": 300},
+    {"name": "Leucanthemum vulgare", "taxon_id": 56057, "max": 300}
+  ],
+  "dandelion": [
+    {"name": "Taraxacum officinale", "taxon_id": 47602, "max": 600, "params": {"term_value_id": "13,14"}}
+  ],
+  "roses": [
+    {"name": "Rosa", "taxon_id": 53438, "max": 600, "params": {"captive": "true"}}
+  ],
+  "sunflowers": [
+    {"name": "Helianthus annuus", "taxon_id": 57983, "max": 600}
+  ],
+  "tulips": [
+    {"name": "Tulipa gesneriana", "taxon_id": 129054, "max": 600}
+  ]
+}
