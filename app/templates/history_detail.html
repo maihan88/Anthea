@@ -1,25 +1,37 @@
-{# Chi tiết một lần phân loại (/history/<id>). Người phụ trách: Nghi #}
+{# Chi tiết một lần phân loại (/history/<id>). Dữ liệu từ GET /api/history/<id> (history_detail.js);
+   id sai hoặc mục đã bị xóa thì hiện khối notFound. Người phụ trách: Nghi #}
 {% extends "base.html" %}
 {% block title %}Chi tiết lịch sử{% endblock %}
 
 {% block content %}
-    <section class="wrap d-flex flex-column" style="padding-top:30px;padding-bottom:80px;gap:16px">
-      <a class="back-link" href="/history">← Tất cả lịch sử</a>
-      <div class="row g-4 g-lg-5 align-items-start">
+    <section id="historyDetail" data-id="{{ prediction_id }}" class="wrap d-flex flex-column" style="padding-top:30px;padding-bottom:80px;gap:16px">
+      <a class="back-link" href="{{ url_for('history') }}">← Tất cả lịch sử</a>
+      <div id="loadStatus" class="muted" role="status">Đang tải…</div>
+      <div id="loadError" class="upload-error load-error d-none" role="alert"><span class="notice-icon">!</span><span></span></div>
+
+      <!-- ============ KHÔNG CÒN MỤC NÀY (id sai hoặc đã bị xóa) ============ -->
+      <div id="notFound" class="empty-state d-none">
+        <h1>Không tìm thấy mục #{{ prediction_id }}</h1>
+        <p>Mục này không còn trong lịch sử — có thể đã bị xóa.</p>
+        <a class="btn btn-forest mt-1" href="{{ url_for('history') }}">Về trang Lịch sử</a>
+      </div>
+
+      <div id="detail" class="row g-4 g-lg-5 align-items-start d-none">
 
         <!-- ============ CỘT TRÁI: ẢNH + THÔNG TIN ============ -->
         <div class="col-lg-6 d-flex flex-column" style="gap:20px">
-          <div class="hist-image stripe" style="--h:85">
-            <img class="cover" alt="Ảnh đã tải lên">
-            <span class="ph-label">[ ảnh đã tải lên · IMG_2041.jpg ]</span>
-            <span class="hist-code">#11</span>
+          <div id="imageBox" class="hist-image stripe">
+            <img id="image" class="cover" alt="">
+            <!-- Chỉ hiện khi file ảnh không còn -->
+            <span id="imageLabel" class="ph-label"></span>
+            <span id="code" class="hist-code"></span>
           </div>
           <dl class="meta-rows">
-            <div><dt>Thời gian</dt><dd>21:05 · 21/10/2026</dd></div>
-            <div><dt>Tên tệp</dt><dd>IMG_2041.jpg</dd></div>
-            <div><dt>Dung lượng</dt><dd>2.1 MB</dd></div>
-            <div><dt>Mô hình</dt><dd>flower_cnn.keras · v2</dd></div>
-            <div><dt>Ngưỡng tin cậy</dt><dd>50%</dd></div>
+            <div><dt>Thời gian</dt><dd id="metaTime"></dd></div>
+            <div><dt>Tên tệp</dt><dd id="metaFile"></dd></div>
+            <div><dt>Dung lượng</dt><dd id="metaSize"></dd></div>
+            <div><dt>Mô hình</dt><dd id="metaModel"></dd></div>
+            <div><dt>Ngưỡng tin cậy</dt><dd id="metaThreshold"></dd></div>
           </dl>
         </div>
 
@@ -28,54 +40,44 @@
           <div class="d-flex justify-content-between align-items-end gap-3 flex-wrap">
             <div class="d-flex flex-column gap-2">
               <div class="d-flex align-items-center gap-2">
-                <span class="dot" style="--h:85;width:10px;height:10px" aria-hidden="true"></span>
+                <span id="dot" class="dot" style="width:10px;height:10px" aria-hidden="true"></span>
                 <span class="eyebrow">Kết quả dự đoán</span>
               </div>
-              <h1 class="hist-title">Hướng dương</h1>
-              <div class="hist-en">Sunflower · Helianthus annuus</div>
+              <h1 id="nameVi" class="hist-title"></h1>
+              <div id="nameEn" class="hist-en"></div>
             </div>
             <div class="text-end">
-              <!-- Dưới ngưỡng: thêm class "low" -->
-              <div class="hist-pct">93%</div>
+              <!-- Dưới ngưỡng: JS thêm class "low" -->
+              <div id="pct" class="hist-pct"></div>
               <div style="font-size:12px;color:var(--ink-5);margin-top:4px">độ tin cậy</div>
             </div>
           </div>
 
-          <!-- Chỉ hiện khi độ tin cậy dưới ngưỡng -->
-          <div class="notice d-none">
+          <!-- Chỉ hiện khi độ tin cậy dưới ngưỡng lưu cùng lần phân loại này -->
+          <div id="unsure" class="notice d-none">
             <span class="notice-icon">?</span>
-            <div><strong style="font-weight:600">Chưa chắc chắn.</strong> Độ tin cậy thấp hơn 50% — ảnh có thể không thuộc 5 loài Anthea đã học.</div>
+            <div><strong style="font-weight:600">Chưa chắc chắn.</strong> Độ tin cậy thấp hơn <span id="unsureThreshold"></span> — ảnh có thể không thuộc 5 loài Anthea đã học.</div>
           </div>
 
-          <div class="prob-box">
+          <div id="top3" class="prob-box">
             <!-- Chỉ hiện top 3 giống màn kết quả ở trang Nhận diện (thiết kế gốc hiện cả 5 loài) -->
             <span class="prob-label">Top 3 dự đoán</span>
-            <div class="top3-row">
-              <span class="top3-rank">01</span>
-              <span style="font-weight:600">Hướng dương</span>
-              <div class="bar-track"><div class="bar-fill main" style="width:93%"></div></div>
-              <span class="top3-pct">93%</span>
-            </div>
-            <div class="top3-row">
-              <span class="top3-rank">02</span>
-              <span>Hoa hồng</span>
-              <div class="bar-track"><div class="bar-fill" style="width:2.7%"></div></div>
-              <span class="top3-pct">3%</span>
-            </div>
-            <div class="top3-row">
-              <span class="top3-rank">03</span>
-              <span>Tulip</span>
-              <div class="bar-track"><div class="bar-fill" style="width:2.1%"></div></div>
-              <span class="top3-pct">2%</span>
-            </div>
           </div>
 
           <div class="d-flex gap-2 flex-wrap">
-            <a class="btn btn-forest btn-lg-pill" href="/flowers/4">Xem thông tin loài →</a>
+            <a id="flowerLink" class="btn btn-forest btn-lg-pill">Xem thông tin loài →</a>
             <button id="btnDelete" type="button" class="btn btn-del-all btn-lg-pill">Xóa khỏi lịch sử</button>
           </div>
         </div>
 
       </div>
     </section>
+{% endblock %}
+
+{% block after_main %}
+  {% include "_confirm_modal.html" %}
+{% endblock %}
+
+{% block scripts %}
+  <script src="{{ url_for('static', filename='js/history_detail.js') }}"></script>
 {% endblock %}
