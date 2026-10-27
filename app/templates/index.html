@@ -79,49 +79,32 @@
     </section>
 
     <!-- ============ NHẬN DIỆN GẦN ĐÂY (3 mục mới nhất; ẩn khi lịch sử trống) ============ -->
-    <section id="recentSection" class="wrap" style="padding-bottom:88px">
+    <section id="recentSection" class="wrap d-none" style="padding-bottom:88px">
       <div class="steps-head">
         <h2>Nhận diện gần đây</h2>
-        <a href="/history">Xem toàn bộ lịch sử →</a>
+        <a href="{{ url_for('history') }}">Xem toàn bộ lịch sử →</a>
       </div>
-      <div id="recentList" class="row g-3">
-        <div class="col-md-6 col-lg-4 col-xl-3">
-          <a class="recent-card" href="/history/12">
-            <span class="recent-thumb stripe" style="--h:10"></span>
-            <span class="recent-meta">
-              <span class="d-flex flex-column gap-1" style="min-width:0">
-                <span class="recent-name">Hoa hồng</span>
-                <span class="recent-time">21/10 · 22:38</span>
-              </span>
-              <span class="recent-pct">87%</span>
-            </span>
-          </a>
-        </div>
-        <div class="col-md-6 col-lg-4 col-xl-3">
-          <a class="recent-card" href="/history/11">
-            <span class="recent-thumb stripe" style="--h:85"></span>
-            <span class="recent-meta">
-              <span class="d-flex flex-column gap-1" style="min-width:0">
-                <span class="recent-name">Hướng dương</span>
-                <span class="recent-time">21/10 · 21:05</span>
-              </span>
-              <span class="recent-pct">93%</span>
-            </span>
-          </a>
-        </div>
-        <div class="col-md-6 col-lg-4 col-xl-3">
-          <a class="recent-card" href="/history/10">
-            <span class="recent-thumb stripe" style="--h:345"></span>
-            <span class="recent-meta">
-              <span class="d-flex flex-column gap-1" style="min-width:0">
-                <span class="recent-name">Tulip</span>
-                <span class="recent-time">20/10 · 16:12</span>
-              </span>
-              <!-- Dưới ngưỡng: thêm class "low" -->
-              <span class="recent-pct low">41%</span>
-            </span>
-          </a>
-        </div>
-      </div>
+      <div id="recentList" class="row g-3"></div>
     </section>
+
+    <!-- Khuôn một thẻ "gần đây": home.js nhân bản cho từng mục của GET /api/history?limit=3 -->
+    <template id="recentTpl">
+      <div class="col-md-6 col-lg-4 col-xl-3">
+        <a class="recent-card">
+          <span class="recent-thumb stripe"><img class="cover" alt="" loading="lazy"></span>
+          <span class="recent-meta">
+            <span class="d-flex flex-column gap-1" style="min-width:0">
+              <span class="recent-name"></span>
+              <span class="recent-time"></span>
+            </span>
+            <!-- Dưới ngưỡng: JS thêm class "low" -->
+            <span class="recent-pct"></span>
+          </span>
+        </a>
+      </div>
+    </template>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{{ url_for('static', filename='js/home.js') }}"></script>
 {% endblock %}

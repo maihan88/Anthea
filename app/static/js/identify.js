@@ -14,7 +14,7 @@ const SAMPLES = [
 
 const $ = id => document.getElementById(id);
 const show = (el, on) => el.classList.toggle('d-none', !on);
-const pct = p => Math.round(p * 100) + '%';
+const pct = p => fmt.pct(p, 0);                        // trang này hiện phần trăm làm tròn: 87%
 
 let currentFile = null;
 let previewUrl = null;
@@ -57,17 +57,13 @@ function showDropError(msg) {
   show($('dropError'), true);
 }
 
-function formatSize(bytes) {
-  return bytes > 1024 * 1024 ? (bytes / 1024 / 1024).toFixed(1) + ' MB' : Math.round(bytes / 1024) + ' KB';
-}
-
 // ---------------- Chọn ảnh ----------------
 // hue: màu khung sọc của ô ảnh (thiết kế: theo loài của ảnh mẫu, mặc định 140)
 function chooseFile(file, hue = 140) {
   if (!file) return;
   if (!TYPES.includes(file.type)) return showDropError('Định dạng chưa được hỗ trợ — vui lòng chọn ảnh JPG hoặc PNG.');
   if (file.size > MAX_BYTES) return showDropError(`Ảnh nặng ${(file.size / 1024 / 1024).toFixed(1)} MB — vượt giới hạn 5 MB.`);
-  setChosen(file, { src: URL.createObjectURL(file), size: formatSize(file.size), hue });
+  setChosen(file, { src: URL.createObjectURL(file), size: fmt.size(file.size), hue });
 }
 
 // src = null: không có ảnh xem trước, hiện "[ ảnh mẫu · tên file ]" trên khung sọc
@@ -108,18 +104,10 @@ function placeholderFile(name) {
 }
 
 // ---------------- Phân loại ----------------
-async function predict(file) {
+function predict(file) {
   const form = new FormData();
   form.append('image', file);
-  let res;
-  try {
-    res = await fetch('/api/predict', { method: 'POST', body: form });
-  } catch {
-    throw new Error('Không kết nối được tới máy chủ.');
-  }
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.error || 'Máy chủ gặp lỗi khi phân loại ảnh.');
-  return data;
+  return api.post('/api/predict', form);
 }
 
 const scanLine = $('analyzing').querySelector('.scan-line');
@@ -181,13 +169,7 @@ function renderResult({ top, threshold, uncertain, history_id }) {
   $('resThreshold').textContent = pct(threshold);
   show($('resUnsure'), uncertain);
 
-  $('resTop3').innerHTML = top.map((f, i) => `
-    <div class="top3-row">
-      <span class="top3-rank">0${i + 1}</span>
-      <span${i === 0 ? ' style="font-weight:600"' : ''}>${f.name_vi}</span>
-      <div class="bar-track"><div class="bar-fill${i === 0 ? ' main' : ''}${i === 0 && uncertain ? ' low' : ''}" style="width:${(f.confidence * 100).toFixed(1)}%"></div></div>
-      <span class="top3-pct">${pct(f.confidence)}</span>
-    </div>`).join('');
+  renderTop3($('resTop3'), top, uncertain);
 
   $('resHistLink').href = history_id != null ? `/history/${history_id}` : '/history';
   $('resLink').href = `/flowers/${best.id}`;

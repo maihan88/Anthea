@@ -6,6 +6,7 @@ Người phụ trách: Hân
 """
 from datetime import datetime
 
+from flask import url_for
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
@@ -53,6 +54,26 @@ class Prediction(db.Model):
     # Xóa lần phân loại thì 3 dòng điểm xóa theo
     scores = db.relationship("PredictionScore", back_populates="prediction", order_by="PredictionScore.ranking",
                              cascade="all, delete-orphan", passive_deletes=True)
+
+    def to_dict(self, detail=False):
+        """Một mục lịch sử cho /api/history. detail=True: thêm phần trang Chi tiết lịch sử cần.
+        uncertain tính bằng ngưỡng lưu cùng dòng này, không phải ngưỡng hiện tại của mô hình."""
+        data = {
+            "id": self.id,
+            "flower": {"id": self.flower.id, "name_vi": self.flower.name_vi, "hue": self.flower.hue},
+            "confidence": self.confidence, "threshold": self.threshold,
+            "uncertain": self.confidence < self.threshold,
+            "image_url": url_for("static", filename=self.image_path),
+            "original_name": self.original_name,
+            "created_at": self.created_at.isoformat(timespec="seconds"),
+        }
+        if detail:
+            data.update(
+                flower=self.flower.to_dict(), file_size=self.file_size, model_version=self.model_version,
+                # Cùng dạng top của /api/predict (thông tin loài + confidence), để hai trang dùng chung hàm vẽ
+                top=[{**s.flower.to_dict(), "confidence": s.confidence} for s in self.scores],
+            )
+        return data
 
 
 class PredictionScore(db.Model):
