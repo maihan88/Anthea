@@ -132,6 +132,10 @@ main { flex: 1; }
 .ph-label { font-family: var(--mono); font-size: 11px; color: #3c463d; }
 .cover { width: 100%; height: 100%; object-fit: cover; display: block; }
 .cover:not([src]) { display: none; }  /* <img> chưa có ảnh thì ẩn */
+/* Ảnh thật phủ lên khung sọc; chưa có ảnh (hoặc ảnh lỗi bị JS gỡ src) thì khung sọc và nhãn [ … ] hiện ra */
+.flower-thumb img.cover, .detail-gallery img.cover, .history-thumb img.cover, .recent-thumb img.cover { position: absolute; inset: 0; }
+.flower-thumb img.cover[src] ~ .ph-label, .detail-gallery img.cover[src] ~ .ph-label { display: none; }
+.load-error { margin: 0; }  /* .upload-error dùng làm khung báo lỗi tải dữ liệu, bỏ lề của trang Nhận diện */
 
 .notice {
   display: flex; gap: 12px; align-items: flex-start;
@@ -251,7 +255,7 @@ a.flower-card:hover { color: var(--ink); transform: translateY(-3px); box-shadow
 
 .back-link { position: relative; z-index: 2; font-size: 14px; text-decoration: none; align-self: flex-start; padding: 10px 0; }  /* nổi trên lề âm của .row bên dưới để bấm được */
 .detail-gallery { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.detail-gallery > div { border-radius: 18px; overflow: hidden; aspect-ratio: 1; display: grid; place-items: center; }
+.detail-gallery > div { position: relative; border-radius: 18px; overflow: hidden; aspect-ratio: 1; display: grid; place-items: center; }
 .detail-gallery > div:first-child { grid-column: span 2; aspect-ratio: 4 / 3; border-radius: 24px; }
 .detail-title { margin: 0; font-family: var(--serif); font-weight: 400; font-size: clamp(44px, 5vw, 64px); line-height: 1; letter-spacing: -.025em; }
 .detail-sci { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-5); font-weight: 500; }
@@ -270,7 +274,7 @@ a.flower-card:hover { color: var(--ink); transform: translateY(-3px); box-shadow
 .history-table { --bs-table-bg: transparent; --bs-table-hover-bg: #f3f1ea; --bs-table-hover-color: var(--ink); --bs-table-color: var(--ink); margin: 0; min-width: 680px; font-size: 14px; }
 .history-table th { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); padding: 12px 14px; border-bottom: 0; }
 .history-table td { padding: 10px 14px; border-top: 1px solid var(--line); border-bottom: 0; vertical-align: middle; }
-.history-thumb { width: 60px; height: 60px; border-radius: 14px; overflow: hidden; }
+.history-thumb { position: relative; width: 60px; height: 60px; border-radius: 14px; overflow: hidden; }
 .history-name { font-family: var(--serif); font-size: 22px; }
 .history-file { font-family: var(--mono); font-size: 12px; color: var(--ink-3); margin-top: 3px; max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .badge-unsure { font-size: 12px; font-weight: 600; color: #6b4a0f; background: #fbf0d9; border: 1px solid #e5c77f; padding: 2px 10px; border-radius: 999px; }
@@ -295,7 +299,7 @@ a.flower-card:hover { color: var(--ink); transform: translateY(-3px); box-shadow
   --bs-btn-active-color: #fff; --bs-btn-active-bg: #7f2f1b; --bs-btn-active-border-color: #7f2f1b;
 }
 .empty-state { border: 1.5px dashed rgba(47, 74, 55, .35); border-radius: 24px; padding: 64px 28px; display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; }
-.empty-state h2 { margin: 0; font-family: var(--serif); font-weight: 400; font-size: 28px; }
+.empty-state h1, .empty-state h2 { margin: 0; font-family: var(--serif); font-weight: 400; font-size: 28px; }
 .empty-state p { margin: 0; color: var(--ink-2); font-size: 15px; }
 .modal-content.anthea-modal { background: var(--card); border: 0; border-radius: 24px; padding: 28px; box-shadow: 0 30px 70px -20px rgba(31, 42, 34, .5); }
 .anthea-modal h2 { margin: 0 0 14px; font-family: var(--serif); font-weight: 400; font-size: 28px; }
@@ -319,6 +323,8 @@ a.flower-card:hover { color: var(--ink); transform: translateY(-3px); box-shadow
 .seg { display: flex; gap: 2px; background: var(--pill); padding: 3px; border-radius: 999px; }
 .seg button { border: 0; padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 500; background: transparent; color: var(--ink); }
 .seg button.active { background: var(--card); }
+.chart-hit { fill: transparent; }
+.chart-hit:hover { fill: rgba(47, 74, 55, .06); }  /* dải epoch đang rê chuột trên biểu đồ huấn luyện */
 .legend { display: flex; gap: 20px; font-size: 13px; color: var(--ink-3); flex-wrap: wrap; align-items: center; }
 .legend i { display: inline-block; width: 18px; height: 3px; border-radius: 2px; margin-right: 8px; vertical-align: middle; }
 .legend i.sq { width: 12px; height: 12px; border-radius: 3px; }
@@ -349,7 +355,7 @@ a.flower-card:hover { color: var(--ink); transform: translateY(-3px); box-shadow
 
 .recent-card { display: block; height: 100%; background: var(--card); border: 1px solid var(--line); border-radius: 22px; padding: 10px; color: var(--ink); text-decoration: none; transition: transform .25s, box-shadow .25s; }
 .recent-card:hover { color: var(--ink); transform: translateY(-3px); box-shadow: 0 20px 40px -24px rgba(31, 42, 34, .35); }
-.recent-thumb { display: block; aspect-ratio: 16 / 10; border-radius: 16px; overflow: hidden; }
+.recent-thumb { position: relative; display: block; aspect-ratio: 16 / 10; border-radius: 16px; overflow: hidden; }
 .recent-meta { padding: 14px 8px 6px; display: flex; justify-content: space-between; align-items: flex-end; gap: 10px; }
 .recent-name { font-family: var(--serif); font-size: 22px; line-height: 1.1; }
 .recent-time { font-family: var(--mono); font-size: 12px; color: var(--ink-5); }
