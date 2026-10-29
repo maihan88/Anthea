@@ -86,9 +86,13 @@ function drawChart(svg, train, val, { best, format }) {
     nodes.push(svgEl('line', { x1: 40, y1: gy, x2: 550, y2: gy, stroke: k === 0 ? 'rgba(31,42,34,.2)' : 'rgba(31,42,34,.08)' }));
     labels.append(svgText(32, gy + 4, (lo + k * step).toFixed(1), 'end'));
   }
-  // Nhãn trục ngang: "epoch 1", mỗi 10 epoch, và epoch cuối
+  // Nhãn trục ngang: "epoch 1", mỗi 10 epoch, và epoch cuối. Nhãn chẵn chục nào quá sát nhãn đầu/cuối thì bỏ
+  // cho khỏi dính chữ (83 epoch: "80" nằm sát "83")
   labels.append(svgText(40, 222, 'epoch 1'));
-  for (let e = 10; e < n - 2; e += 10) labels.append(svgText(x(e - 1), 222, String(e), 'middle'));
+  for (let e = 10; e < n; e += 10) {
+    const ex = x(e - 1);
+    if (ex > 90 && ex < 525) labels.append(svgText(ex, 222, String(e), 'middle'));
+  }
   labels.append(svgText(550, 222, String(n), 'end'));
 
   // Epoch tốt nhất: vạch đứng nét chấm và nhãn phía trên
