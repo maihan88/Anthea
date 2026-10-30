@@ -6,7 +6,6 @@ Người phụ trách: Hân
 """
 from datetime import datetime
 
-from flask import url_for
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
@@ -43,7 +42,8 @@ class Prediction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     flower_id = db.Column(db.Integer, db.ForeignKey("flowers.id"), nullable=False)   # loài đứng đầu
     confidence = db.Column(db.Float, nullable=False)
-    image_path = db.Column(db.String(255), nullable=False)       # trong static/, ví dụ uploads/3f9c….jpg
+    image_url = db.Column(db.String(500), nullable=False)        # link ảnh trên Cloudinary (https://res.cloudinary.com/…)
+    image_id = db.Column(db.String(255), nullable=False)         # mã ảnh trên Cloudinary (public_id), dùng khi xóa ảnh
     original_name = db.Column(db.String(255), nullable=False)    # tên file người dùng đặt, chỉ để hiển thị
     file_size = db.Column(db.Integer, nullable=False)            # byte
     model_version = db.Column(db.String(20), nullable=False)     # "v1", "v2"
@@ -61,18 +61,24 @@ class Prediction(db.Model):
         data = {
             "id": self.id,
             "flower": {"id": self.flower.id, "name_vi": self.flower.name_vi, "hue": self.flower.hue},
-            "confidence": self.confidence, "threshold": self.threshold,
+            "confidence": self.confidence,
+            "threshold": self.threshold,
             "uncertain": self.confidence < self.threshold,
-            "image_url": url_for("static", filename=self.image_path),
+            "image_url": self.image_url,
             "original_name": self.original_name,
-            "created_at": self.created_at.isoformat(timespec="seconds"),
+            "created_at": self.created_at.isoformat(timespec="seconds"),     # "2026-10-21T22:38:05"
         }
         if detail:
-            data.update(
-                flower=self.flower.to_dict(), file_size=self.file_size, model_version=self.model_version,
-                # Cùng dạng top của /api/predict (thông tin loài + confidence), để hai trang dùng chung hàm vẽ
-                top=[{**s.flower.to_dict(), "confidence": s.confidence} for s in self.scores],
-            )
+            data["flower"] = self.flower.to_dict()                          # đủ thông tin loài
+            data["file_size"] = self.file_size
+            data["model_version"] = self.model_version
+            # Top 3, cùng dạng "top" của /api/predict để hai trang dùng chung hàm vẽ
+            top = []
+            for score in self.scores:
+                item = score.flower.to_dict()
+                item["confidence"] = score.confidence
+                top.append(item)
+            data["top"] = top
         return data
 
 

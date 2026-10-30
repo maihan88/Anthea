@@ -1,46 +1,55 @@
 /* Trang Thư viện hoa: mỗi loài trong bảng flowers một thẻ. Người phụ trách: Nghi */
 
-const $ = id => document.getElementById(id);
-const show = (el, on) => el.classList.toggle('d-none', !on);
-
-function renderCard(f) {
-  const col = $('flowerTpl').content.firstElementChild.cloneNode(true);
-  const card = col.querySelector('.flower-card');
-  const img = col.querySelector('img');
-  const total = f.image_counts.tf_flowers + f.image_counts.web;
-
-  col.querySelector('.flower-thumb').style.setProperty('--h', f.hue);
-  col.querySelector('.dot').style.setProperty('--h', f.hue);
-  col.querySelector('.ph-label').textContent = `[ Ảnh ${f.name_vi.toLowerCase()} ]`;
-  col.querySelector('.flower-vi').textContent = f.name_vi;
-  col.querySelector('.flower-en').textContent = f.name_en;
-  if (f.cover) {
-    img.src = f.cover;
-    img.addEventListener('error', () => img.removeAttribute('src'));   // ảnh hỏng thì quay về khung sọc
+// HTML một thẻ hoa. flower là một phần tử của GET /api/flowers
+function flowerCardHtml(flower) {
+  // Ảnh bìa = ảnh mẫu đầu tiên; chưa có ảnh mẫu thì để trống, chỉ hiện khung sọc
+  let image = '';
+  if (flower.samples.length > 0) {
+    image = `<img class="cover" src="${flower.samples[0]}" alt="" loading="lazy">`;
   }
 
-  if (f.in_model) {
-    card.href = `/flowers/${f.id}`;
-    col.querySelector('.flower-badge').textContent = `${fmt.num(total)} ảnh`;
-  } else {
-    card.removeAttribute('href');
-    card.classList.add('soon');
-    card.setAttribute('aria-disabled', 'true');
-    col.querySelector('.flower-badge').textContent = 'Sắp có';
+  // Loài đã có trong mô hình: bấm vào xem chi tiết.
+  // Loài chưa có (hoa sen, in_model = false): thẻ mờ "Sắp có", không bấm được.
+  let cardClass = 'flower-card';
+  let link = `href="/flowers/${flower.id}"`;
+  let badge = formatNumber(flower.image_counts.tf_flowers + flower.image_counts.web) + ' ảnh';
+  if (!flower.in_model) {
+    cardClass = 'flower-card soon';
+    link = '';
+    badge = 'Sắp có';
   }
-  return col;
+
+  return `
+    <div class="col-sm-6 col-lg-4 col-xl-3">
+      <a class="${cardClass}" ${link}>
+        <span class="flower-thumb stripe" style="--h:${flower.hue}">
+          ${image}
+          <span class="ph-label">[ Ảnh ${flower.name_vi.toLowerCase()} ]</span>
+          <span class="flower-badge">${badge}</span>
+        </span>
+        <span class="flower-meta">
+          <span class="d-flex flex-column gap-1">
+            <span class="flower-vi">${flower.name_vi}</span>
+            <span class="flower-en">${flower.name_en}</span>
+          </span>
+          <span class="dot" style="--h:${flower.hue}"></span>
+        </span>
+      </a>
+    </div>`;
 }
 
-async function load() {
+async function loadFlowers() {
   try {
-    const flowers = await api.get('/api/flowers');
-    $('flowerGrid').replaceChildren(...flowers.map(renderCard));
-  } catch (e) {
-    $('loadError').lastElementChild.textContent = `Không tải được danh sách loài hoa. ${e.message}`;
-    show($('loadError'), true);
-  } finally {
-    show($('loadStatus'), false);
+    const flowers = await callApi('/api/flowers');
+    let html = '';
+    for (const flower of flowers) {
+      html += flowerCardHtml(flower);
+    }
+    $('flowerGrid').innerHTML = html;
+  } catch (error) {
+    showLoadError('Không tải được danh sách loài hoa. ' + error.message);
   }
+  hide('loadStatus');
 }
 
-load();
+loadFlowers();

@@ -1,74 +1,66 @@
 /* Trang Chi tiết lịch sử (/history/<id>). Người phụ trách: Nghi */
 
-const $ = id => document.getElementById(id);
-const show = (el, on) => el.classList.toggle('d-none', !on);
-const ID = $('historyDetail').dataset.id;
+// Lấy id trên thanh địa chỉ: "/history/12" -> "12"
+const predictionId = location.pathname.split('/').pop();
 
-let current = null;                                    // mục đang hiện, dùng cho nút Xóa
+function showPrediction(item) {
+  const flower = item.flower;
+  document.title = flower.name_vi + ' #' + item.id + ' · Anthea';
 
-function showError(msg) {
-  $('loadError').lastElementChild.textContent = msg;
-  show($('loadError'), Boolean(msg));
-}
+  // Cột trái: ảnh + thông tin
+  $('imageBox').style.setProperty('--h', flower.hue);
+  $('image').src = item.image_url;
+  $('image').alt = 'Ảnh đã tải lên: ' + item.original_name;
+  $('code').textContent = '#' + item.id;
+  $('metaTime').textContent = formatDateTime(item.created_at);
+  $('metaFile').textContent = item.original_name;
+  $('metaSize').textContent = formatSize(item.file_size);
+  $('metaModel').textContent = item.model_version;       // phiên bản LÚC phân loại, không phải bản hiện tại
+  $('metaThreshold').textContent = formatPercent(item.threshold);
 
-function render(p) {
-  const f = p.flower;
-  const { date, time } = fmt.parts(p.created_at);
-  document.title = `${f.name_vi} #${p.id} · Anthea`;
+  // Cột phải: kết quả
+  $('dot').style.setProperty('--h', flower.hue);
+  $('nameVi').textContent = flower.name_vi;
+  $('nameEn').textContent = flower.name_en + ' · ' + flower.scientific;
+  $('pct').textContent = formatPercent(item.confidence);
+  $('top3').innerHTML = top3Html(item.top, item.uncertain);
+  $('flowerLink').href = '/flowers/' + flower.id;
 
-  $('imageBox').style.setProperty('--h', f.hue);
-  $('image').src = p.image_url;
-  $('image').alt = `Ảnh đã tải lên: ${p.original_name}`;
-  $('imageLabel').textContent = `[ ảnh đã tải lên · ${p.original_name} ]`;
-  $('code').textContent = `#${p.id}`;
-  $('metaTime').textContent = `${time} · ${date}`;
-  $('metaFile').textContent = p.original_name;
-  $('metaSize').textContent = fmt.size(p.file_size);
-  $('metaModel').textContent = p.model_version;        // phiên bản lúc phân loại, không phải phiên bản hiện tại
-  $('metaThreshold').textContent = fmt.pct(p.threshold, 0);
-
-  $('dot').style.setProperty('--h', f.hue);
-  $('nameVi').textContent = f.name_vi;
-  $('nameEn').textContent = `${f.name_en} · ${f.scientific}`;
-  $('pct').textContent = fmt.pct(p.confidence, 0);
-  $('pct').classList.toggle('low', p.uncertain);
-  $('unsureThreshold').textContent = fmt.pct(p.threshold, 0);
-  show($('unsure'), p.uncertain);
-  renderTop3($('top3'), p.top, p.uncertain);
-  $('flowerLink').href = `/flowers/${f.id}`;
-}
-
-async function load() {
-  showError('');
-  [$('detail'), $('notFound')].forEach(el => show(el, false));
-  show($('loadStatus'), true);
-  try {
-    current = await api.get(`/api/history/${ID}`);
-    render(current);
-    show($('detail'), true);
-  } catch (e) {
-    current = null;
-    if (e.status === 404) show($('notFound'), true);
-    else showError(`Không tải được mục này. ${e.message}`);
-  } finally {
-    show($('loadStatus'), false);
+  if (item.uncertain) {
+    $('pct').classList.add('low');
+    $('unsureThreshold').textContent = formatPercent(item.threshold);
+    show('unsure');
   }
 }
 
-async function deleteThis() {
-  if (!current) return;
-  const label = `Kết quả “${current.flower.name_vi}” lúc ${fmt.datetime(current.created_at)}`;
-  if (!await confirmDialog('Xóa mục này?', `${label} và ảnh đã tải lên sẽ bị xóa. Không thể hoàn tác.`)) return;
+async function loadPrediction() {
   try {
-    await api.del(`/api/history/${ID}`);
-  } catch (e) {
-    if (e.status !== 404) return showError(`Chưa xóa được. ${e.message}`);
+    const item = await callApi('/api/history/' + predictionId);
+    showPrediction(item);
+    show('detail');
+  } catch (error) {
+    if (error.status === 404) {
+      show('notFound');                                  // id sai hoặc mục đã bị xóa
+    } else {
+      showLoadError('Không tải được mục này. ' + error.message);
+    }
   }
-  location.href = '/history';                          // xóa xong (hoặc đã bị xóa từ trước) thì về danh sách
+  hide('loadStatus');
 }
 
-$('image').addEventListener('error', () => $('image').removeAttribute('src'));   // file ảnh mất: hiện khung sọc + tên file
-$('btnDelete').addEventListener('click', deleteThis);
-// Xóa xong rồi bấm Back: trình duyệt có thể hiện lại bản cũ đã lưu sẵn, nên hỏi lại API để báo "đã bị xóa"
-window.addEventListener('pageshow', e => { if (e.persisted) load(); });
-load();
+function deleteThis() {
+  askConfirm('Xóa mục này?', 'Kết quả này và ảnh đã tải lên sẽ bị xóa. Không thể hoàn tác.', async function () {
+    try {
+      await callApi('/api/history/' + predictionId, 'DELETE');
+    } catch (error) {
+      if (error.status !== 404) {                       // 404 = đã bị xóa từ trước, coi như xong
+        showLoadError('Chưa xóa được. ' + error.message);
+        return;
+      }
+    }
+    location.href = '/history';                          // xóa xong thì quay về danh sách
+  });
+}
+
+$('btnDelete').onclick = deleteThis;
+loadPrediction();

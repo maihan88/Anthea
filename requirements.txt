@@ -10,6 +10,7 @@ flask-sqlalchemy
 pymysql
 cryptography           # PyMySQL cần gói này để đăng nhập MySQL 8
 python-dotenv          # đọc file .env
+cloudinary             # lưu ảnh người dùng tải lên (dịch vụ lưu trữ đám mây)
 
 requests               # tải ảnh từ iNaturalist (phần thu thập dữ liệu)
 torch                  # chạy CLIP để sàng lọc ảnh (screen.py)

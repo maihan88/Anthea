@@ -114,10 +114,26 @@ python app/seed.py
 
 Chạy lại bao nhiêu lần cũng được. Mỗi máy một CSDL riêng: lịch sử phân loại không đồng bộ giữa hai máy.
 
-### 3. Chạy web
+### 3. Nối Cloudinary (lưu ảnh người dùng tải lên)
+
+1. Đăng ký tài khoản miễn phí ở [cloudinary.com](https://cloudinary.com) (cả nhóm dùng chung một tài khoản cũng được).
+2. Ở trang **Dashboard**, chép dòng **API environment variable**, dạng `cloudinary://<api_key>:<api_secret>@<cloud_name>`.
+3. Dán vào `.env` thành một dòng `CLOUDINARY_URL=cloudinary://...` (chỉ một chữ `CLOUDINARY_URL=` ở đầu dòng).
+
+Để trống `CLOUDINARY_URL` thì web vẫn chạy, ảnh tạm lưu vào `app/static/uploads/`. Ảnh trên Cloudinary nằm trong thư mục `anthea/uploads`; CSDL chỉ lưu đường link (`image_url`) và mã ảnh (`image_id`, dùng khi xóa).
+
+**Máy đã chạy bản cũ** (bảng `predictions` còn cột `image_path`): `seed.py` không tự sửa bảng đã có, nên chạy một lần trong MySQL Workbench rồi chạy lại `python app/seed.py`. Lệnh này xóa toàn bộ lịch sử phân loại cũ:
+
+```sql
+DROP TABLE prediction_scores, predictions;
+```
+
+### 4. Chạy web
 
 ```powershell
 python app/app.py
 ```
 
 Mở http://127.0.0.1:5000.
+
+Các trang nằm trong `app/pages/` là **HTML tĩnh** (không dùng Jinja). Flask chỉ gửi nguyên file; JavaScript trong `app/static/js/` gọi các đường `/api/...` để lấy dữ liệu JSON rồi điền vào trang. `common.js` chứa các hàm dùng chung (gọi API, định dạng số, ngày giờ).

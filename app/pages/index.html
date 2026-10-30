@@ -1,19 +1,47 @@
-{# Trang chủ. Người phụ trách: Nghi #}
-{% extends "base.html" %}
-{% block title %}Trang chủ{% endblock %}
+<!doctype html>
+<!-- Trang chủ. Người phụ trách: Nghi -->
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Trang chủ · Anthea</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/static/css/style.css" rel="stylesheet">
+  <link rel="icon" type="image/png" href="/static/img/favicon.png">
+</head>
+<body>
+  <!-- ============ HEADER (giống nhau ở mọi trang, chỉ khác mục có class="active") ============ -->
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="/">
+        <img class="brand-logo" src="/static/img/logo.png" alt="">
+        <span class="brand-name">Anthea</span>
+      </a>
+      <nav class="main-nav">
+        <a href="/" class="active">Trang chủ</a>
+        <a href="/identify">Nhận diện</a>
+        <a href="/flowers">Thư viện hoa</a>
+        <a href="/history">Lịch sử</a>
+        <a href="/model">Mô hình</a>
+      </nav>
+    </div>
+  </header>
 
-{% block content %}
+  <main>
     <!-- ============ HERO ============ -->
     <section class="hero">
-      <div class="hero-blob-1" aria-hidden="true"></div>
+      <div class="hero-blob-1"></div>
       <div class="wrap">
         <div class="row g-4 g-lg-5 align-items-center">
 
           <!-- Cột trái: giới thiệu -->
           <div class="col-lg-6">
             <div class="hero-copy">
-              <span class="hero-pill">Nhận diện loài hoa bằng học sâu</span>
-              <h1 class="hero-title">Mỗi bông hoa đều có <em>một cái tên</em>.</h1>
+              <!-- <span class="hero-pill">Nhận diện loài hoa bằng học sâu</span> -->
+              <h1 class="hero-title">Mỗi bông hoa đều có một cái tên.</h1>
               <p class="hero-lead">Chụp hoặc tải lên một tấm ảnh — Anthea cho bạn biết đó là loài hoa gì, kèm độ tin cậy, ý nghĩa và mùa nở của nó.</p>
               <div class="d-flex flex-wrap gap-2">
                 <a class="btn btn-forest btn-lg-pill" href="/identify">Bắt đầu nhận diện →</a>
@@ -40,7 +68,7 @@
                 <div class="stripe" style="--h:345"><span class="ph-label">[ Ảnh hoa phụ ]</span></div>
                 <div class="stripe" style="--h:140"><span class="ph-label">[ Ảnh hoa phụ ]</span></div>
               </div>
-              <div class="hero-result" aria-hidden="true">
+              <div class="hero-result">
                 <div class="d-flex align-items-center gap-2">
                   <span class="dot" style="--h:85;width:8px;height:8px"></span>
                   <span class="eyebrow" style="font-size:11px">Kết quả nhận diện</span>
@@ -78,33 +106,26 @@
       </div>
     </section>
 
-    <!-- ============ NHẬN DIỆN GẦN ĐÂY (3 mục mới nhất; ẩn khi lịch sử trống) ============ -->
+    <!-- ============ NHẬN DIỆN GẦN ĐÂY (4 mục mới nhất; ẩn khi lịch sử trống) ============ -->
     <section id="recentSection" class="wrap d-none" style="padding-bottom:88px">
       <div class="steps-head">
         <h2>Nhận diện gần đây</h2>
-        <a href="{{ url_for('history') }}">Xem toàn bộ lịch sử →</a>
+        <a href="/history">Xem toàn bộ lịch sử →</a>
       </div>
+      <!-- home.js điền các thẻ vào đây -->
       <div id="recentList" class="row g-3"></div>
     </section>
+  </main>
 
-    <!-- Khuôn một thẻ "gần đây": home.js nhân bản cho từng mục của GET /api/history?limit=3 -->
-    <template id="recentTpl">
-      <div class="col-md-6 col-lg-4 col-xl-3">
-        <a class="recent-card">
-          <span class="recent-thumb stripe"><img class="cover" alt="" loading="lazy"></span>
-          <span class="recent-meta">
-            <span class="d-flex flex-column gap-1" style="min-width:0">
-              <span class="recent-name"></span>
-              <span class="recent-time"></span>
-            </span>
-            <!-- Dưới ngưỡng: JS thêm class "low" -->
-            <span class="recent-pct"></span>
-          </span>
-        </a>
-      </div>
-    </template>
-{% endblock %}
+  <!-- ============ FOOTER ============ -->
+  <footer class="site-footer">
+    <div class="wrap">
+      <span><em>Anthea</em> — nhận diện hoa bằng CNN</span>
+      <!-- <span class="mono" style="font-size:12px">TensorFlow · Keras · Flask · MySQL</span> -->
+    </div>
+  </footer>
 
-{% block scripts %}
-  <script src="{{ url_for('static', filename='js/home.js') }}"></script>
-{% endblock %}
+  <script src="/static/js/common.js"></script>
+  <script src="/static/js/home.js"></script>
+</body>
+</html>

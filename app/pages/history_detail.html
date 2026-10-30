@@ -1,0 +1,130 @@
+<!doctype html>
+<!-- Chi tiết một lần phân loại (/history/<id>). Dữ liệu từ GET /api/history/<id> (history_detail.js).
+     id sai hoặc mục đã bị xóa thì hiện khối notFound. Người phụ trách: Nghi -->
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chi tiết lịch sử · Anthea</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/static/css/style.css" rel="stylesheet">
+  <link rel="icon" type="image/png" href="/static/img/favicon.png">
+</head>
+<body>
+  <!-- ============ HEADER ============ -->
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="/">
+        <img class="brand-logo" src="/static/img/logo.png" alt="">
+        <span class="brand-name">Anthea</span>
+      </a>
+      <nav class="main-nav">
+        <a href="/">Trang chủ</a>
+        <a href="/identify">Nhận diện</a>
+        <a href="/flowers">Thư viện hoa</a>
+        <a href="/history" class="active">Lịch sử</a>
+        <a href="/model">Mô hình</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="wrap d-flex flex-column" style="padding-top:30px;padding-bottom:80px;gap:16px">
+      <a class="back-link" href="/history">← Tất cả lịch sử</a>
+      <div id="loadStatus" class="muted">Đang tải…</div>
+      <div id="loadError" class="upload-error load-error d-none"><span class="notice-icon">!</span><span id="loadErrorText"></span></div>
+
+      <!-- ============ KHÔNG CÒN MỤC NÀY (id sai hoặc đã bị xóa) ============ -->
+      <div id="notFound" class="empty-state d-none">
+        <h1>Không tìm thấy mục này</h1>
+        <p>Mục này không còn trong lịch sử — có thể đã bị xóa.</p>
+        <a class="btn btn-forest mt-1" href="/history">Về trang Lịch sử</a>
+      </div>
+
+      <div id="detail" class="row g-4 g-lg-5 align-items-start d-none">
+
+        <!-- ============ CỘT TRÁI: ẢNH + THÔNG TIN ============ -->
+        <div class="col-lg-6 d-flex flex-column" style="gap:20px">
+          <div id="imageBox" class="hist-image stripe">
+            <img id="image" class="cover" alt="">
+            <span id="code" class="hist-code"></span>
+          </div>
+          <dl class="meta-rows">
+            <div><dt>Thời gian</dt><dd id="metaTime"></dd></div>
+            <div><dt>Tên tệp</dt><dd id="metaFile"></dd></div>
+            <div><dt>Dung lượng</dt><dd id="metaSize"></dd></div>
+            <div><dt>Mô hình</dt><dd id="metaModel"></dd></div>
+            <div><dt>Ngưỡng tin cậy</dt><dd id="metaThreshold"></dd></div>
+          </dl>
+        </div>
+
+        <!-- ============ CỘT PHẢI: KẾT QUẢ ============ -->
+        <div class="col-lg-6 d-flex flex-column" style="gap:24px">
+          <div class="d-flex justify-content-between align-items-end gap-3 flex-wrap">
+            <div class="d-flex flex-column gap-2">
+              <div class="d-flex align-items-center gap-2">
+                <span id="dot" class="dot" style="width:10px;height:10px"></span>
+                <span class="eyebrow">Kết quả dự đoán</span>
+              </div>
+              <h1 id="nameVi" class="hist-title"></h1>
+              <div id="nameEn" class="hist-en"></div>
+            </div>
+            <div class="text-end">
+              <!-- Dưới ngưỡng: JS thêm class "low" -->
+              <div id="pct" class="hist-pct"></div>
+              <div style="font-size:12px;color:var(--ink-5);margin-top:4px">độ tin cậy</div>
+            </div>
+          </div>
+
+          <!-- Chỉ hiện khi độ tin cậy dưới ngưỡng lưu cùng lần phân loại này -->
+          <div id="unsure" class="notice d-none">
+            <span class="notice-icon">?</span>
+            <div><strong style="font-weight:600">Chưa chắc chắn.</strong> Độ tin cậy thấp hơn <span id="unsureThreshold"></span> — ảnh có thể không thuộc 5 loài Anthea đã học.</div>
+          </div>
+
+          <div class="prob-box">
+            <span class="prob-label">Top 3 dự đoán</span>
+            <!-- history_detail.js điền 3 thanh vào đây -->
+            <div id="top3" class="d-flex flex-column gap-2"></div>
+          </div>
+
+          <div class="d-flex gap-2 flex-wrap">
+            <a id="flowerLink" class="btn btn-forest btn-lg-pill" href="/flowers">Xem thông tin loài →</a>
+            <button id="btnDelete" type="button" class="btn btn-del-all btn-lg-pill">Xóa khỏi lịch sử</button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ HỘP XÁC NHẬN XÓA (Bootstrap modal, mở bằng askConfirm() trong common.js) ============ -->
+  <div class="modal fade" id="confirmModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:440px">
+      <div class="modal-content anthea-modal">
+        <h2 id="confirmTitle"></h2>
+        <p id="confirmText"></p>
+        <div class="d-flex justify-content-end flex-wrap gap-2 mt-4">
+          <button type="button" class="btn btn-line" data-bs-dismiss="modal">Hủy</button>
+          <button id="btnConfirm" type="button" class="btn btn-danger-anthea">Xóa</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="site-footer">
+    <div class="wrap">
+      <span><em>Anthea</em> — nhận diện hoa bằng CNN</span>
+      <!-- <span class="mono" style="font-size:12px">TensorFlow · Keras · Flask · MySQL</span> -->
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/static/js/common.js"></script>
+  <script src="/static/js/history_detail.js"></script>
+</body>
+</html>
