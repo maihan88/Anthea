@@ -1,0 +1,108 @@
+<!doctype html>
+<!-- Lịch sử dự đoán. Dữ liệu từ GET /api/history, xóa bằng DELETE (history.js). Người phụ trách: Nghi -->
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lịch sử · Anthea</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/static/css/style.css" rel="stylesheet">
+  <link rel="icon" type="image/png" href="/static/img/favicon.png">
+</head>
+<body>
+  <!-- ============ HEADER ============ -->
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="/">
+        <img class="brand-logo" src="/static/img/logo.png" alt="">
+        <span class="brand-name">Anthea</span>
+      </a>
+      <nav class="main-nav">
+        <a href="/">Trang chủ</a>
+        <a href="/identify">Nhận diện</a>
+        <a href="/flowers">Thư viện hoa</a>
+        <a href="/history" class="active">Lịch sử</a>
+        <a href="/model">Mô hình</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="d-flex flex-column mx-auto" style="max-width:1100px;padding:56px 24px 80px;gap:28px">
+      <div class="d-flex justify-content-between align-items-end flex-wrap" style="gap:20px">
+        <div class="d-flex flex-column gap-2">
+          <span id="countLabel" class="eyebrow" style="font-weight:600;color:var(--ink-3)">Đang tải…</span>
+          <!-- <h1 class="page-title" style="font-size:clamp(40px,5vw,62px)">Nhật ký <em>vườn hoa</em></h1> -->
+        </div>
+        <button id="btnClearAll" type="button" class="btn btn-del-all d-none">Xóa toàn bộ</button>
+      </div>
+
+      <div id="loadError" class="upload-error load-error d-none"><span class="notice-icon">!</span><span id="loadErrorText"></span></div>
+
+      <!-- ============ BẢNG LỊCH SỬ ============ -->
+      <div id="historyWrap" class="history-card d-none">
+        <div class="table-responsive">
+          <table class="table table-hover history-table">
+            <thead>
+              <tr>
+                <th>Ảnh</th>
+                <th>Loài hoa</th>
+                <th>Độ tin cậy</th>
+                <th>Thời gian</th>
+                <th></th>
+              </tr>
+            </thead>
+            <!-- history.js điền các dòng vào đây -->
+            <tbody id="historyBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ============ CHƯA CÓ LỊCH SỬ (hiện khi danh sách trống) ============ -->
+      <div id="emptyState" class="empty-state d-none">
+        <svg viewBox="0 0 200 200" width="72" height="72">
+          <g fill="none" stroke="#2f4a37" stroke-opacity=".55" stroke-width="5">
+            <ellipse cx="100" cy="56" rx="24" ry="44"/>
+            <ellipse cx="100" cy="56" rx="24" ry="44" transform="rotate(72 100 100)"/>
+            <ellipse cx="100" cy="56" rx="24" ry="44" transform="rotate(144 100 100)"/>
+            <ellipse cx="100" cy="56" rx="24" ry="44" transform="rotate(216 100 100)"/>
+            <ellipse cx="100" cy="56" rx="24" ry="44" transform="rotate(288 100 100)"/>
+          </g>
+        </svg>
+        <h2>Chưa có lịch sử phân loại</h2>
+        <p>Mỗi lần bạn phân loại một ảnh, kết quả sẽ được lưu ở đây.</p>
+        <a class="btn btn-forest mt-1" href="/identify">Sang trang Phân loại</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ HỘP XÁC NHẬN XÓA (Bootstrap modal, mở bằng askConfirm() trong common.js) ============ -->
+  <div class="modal fade" id="confirmModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:440px">
+      <div class="modal-content anthea-modal">
+        <h2 id="confirmTitle"></h2>
+        <p id="confirmText"></p>
+        <div class="d-flex justify-content-end flex-wrap gap-2 mt-4">
+          <button type="button" class="btn btn-line" data-bs-dismiss="modal">Hủy</button>
+          <button id="btnConfirm" type="button" class="btn btn-danger-anthea">Xóa</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="site-footer">
+    <div class="wrap">
+      <span><em>Anthea</em> — nhận diện hoa bằng CNN</span>
+      <!-- <span class="mono" style="font-size:12px">TensorFlow · Keras · Flask · MySQL</span> -->
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/static/js/common.js"></script>
+  <script src="/static/js/history.js"></script>
+</body>
+</html>

@@ -1,38 +1,43 @@
-/* Trang chủ: mục "Nhận diện gần đây" = 3 lần phân loại mới nhất. Người phụ trách: Nghi
-   Hero và khối "Ba bước" là phần minh họa, giữ nguyên trong index.html. */
+/* Trang chủ: mục "Nhận diện gần đây" = 4 lần phân loại mới nhất. Người phụ trách: Nghi
+   Hero và khối "Ba bước" là phần minh họa, viết sẵn trong index.html. */
 
-const $ = id => document.getElementById(id);
-const show = (el, on) => el.classList.toggle('d-none', !on);
+// HTML một thẻ "gần đây". item là một mục của GET /api/history
+function recentCardHtml(item) {
+  let pctClass = 'recent-pct';
+  if (item.uncertain) pctClass = 'recent-pct low';     // dưới ngưỡng: số màu cam
 
-function renderCard(item) {
-  const col = $('recentTpl').content.firstElementChild.cloneNode(true);
-  const img = col.querySelector('img');
-  const pct = col.querySelector('.recent-pct');
-  const { date, time } = fmt.parts(item.created_at);
-
-  col.querySelector('.recent-card').href = `/history/${item.id}`;
-  col.querySelector('.recent-thumb').style.setProperty('--h', item.flower.hue);
-  img.src = item.image_url;
-  img.addEventListener('error', () => img.removeAttribute('src'));   // file ảnh đã mất thì hiện khung sọc
-  col.querySelector('.recent-name').textContent = item.flower.name_vi;
-  col.querySelector('.recent-time').textContent = `${date.slice(0, 5)} · ${time}`;   // "21/10 · 22:38"
-  pct.textContent = fmt.pct(item.confidence, 0);
-  pct.classList.toggle('low', item.uncertain);
-  return col;
+  return `
+    <div class="col-md-6 col-lg-4 col-xl-3">
+      <a class="recent-card" href="/history/${item.id}">
+        <span class="recent-thumb stripe" style="--h:${item.flower.hue}">
+          <img class="cover" src="${item.image_url}" alt="" loading="lazy">
+        </span>
+        <span class="recent-meta">
+          <span class="d-flex flex-column gap-1" style="min-width:0">
+            <span class="recent-name">${item.flower.name_vi}</span>
+            <span class="recent-time">${formatDateTime(item.created_at)}</span>
+          </span>
+          <span class="${pctClass}">${formatPercent(item.confidence)}</span>
+        </span>
+      </a>
+    </div>`;
 }
 
 async function loadRecent() {
   try {
-    const { items } = await api.get('/api/history?limit=3');
-    $('recentList').replaceChildren(...items.map(renderCard));
-    show($('recentSection'), items.length > 0);
-  } catch (e) {
-    // Mục phụ của Trang chủ: lỗi thì cứ để ẩn, không chiếm chỗ bằng thông báo lỗi
-    show($('recentSection'), false);
-    console.warn('Không tải được nhận diện gần đây:', e.message);
+    const data = await callApi('/api/history?limit=4');
+    if (data.items.length === 0) return;                // chưa có lịch sử: giữ mục này ẩn
+
+    let html = '';
+    for (const item of data.items) {
+      html += recentCardHtml(item);
+    }
+    $('recentList').innerHTML = html;
+    show('recentSection');
+  } catch (error) {
+    // Đây chỉ là mục phụ: lỗi thì cứ để ẩn, ghi lỗi ra Console (F12) để xem
+    console.warn('Không tải được nhận diện gần đây:', error.message);
   }
 }
 
-// Bấm Back quay về Trang chủ sau khi xóa lịch sử: tải lại để không hiện mục đã xóa
-window.addEventListener('pageshow', e => { if (e.persisted) loadRecent(); });
 loadRecent();

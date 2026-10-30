@@ -24,4 +24,7 @@ SQLALCHEMY_DATABASE_URI = (
 # MySQL tự ngắt kết nối để lâu không dùng; kiểm tra trước khi dùng lại cho khỏi lỗi "server has gone away"
 SQLALCHEMY_ENGINE_OPTIONS = {"pool_pre_ping": True, "pool_recycle": 3600}
 
+# Cloudinary (lưu ảnh người dùng tải lên). Dạng cloudinary://<api_key>:<api_secret>@<cloud_name>,
+# chép ở trang Dashboard của Cloudinary. Để trống thì ảnh tạm lưu vào UPLOAD_DIR (xem storage.py).
+CLOUDINARY_URL = os.getenv("CLOUDINARY_URL", "")
 UPLOAD_DIR = BASE / "app" / "static" / "uploads"
