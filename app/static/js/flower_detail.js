@@ -26,17 +26,7 @@ function showFlower(flower) {
   }
   $('gallery').innerHTML = html;
 
-  // Loài chưa có trong mô hình (hoa sen): chưa có dữ liệu huấn luyện, không mời nhận diện
-  if (flower.in_model) {
-    const counts = flower.image_counts;
-    let text = formatNumber(counts.tf_flowers) + ' ảnh TF Flowers';
-    if (counts.web > 0) text += ' + ' + formatNumber(counts.web) + ' ảnh tự thu thập';
-    $('dataCount').textContent = text;
-    $('btnIdentify').textContent = 'Nhận diện một bông ' + flower.name_vi.toLowerCase();
-  } else {
-    $('dataCount').textContent = 'Chưa có trong mô hình — sắp có';
-    hide('btnIdentify');
-  }
+  $('btnIdentify').textContent = 'Nhận diện một bông ' + flower.name_vi.toLowerCase();
 }
 
 async function loadFlower() {

@@ -12,7 +12,7 @@ db = SQLAlchemy()
 
 
 class Flower(db.Model):
-    """Một loài hoa. id cố định 1–5 theo thứ tự class_names.json, hoa sen là 6."""
+    """Một lớp của mô hình. id cố định 1–6 theo thứ tự class_names.json: 5 loài hoa, rồi lớp "Khác" (code "other")."""
     __tablename__ = "flowers"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -24,7 +24,7 @@ class Flower(db.Model):
     description = db.Column(db.Text)
     meaning = db.Column(db.Text)
     season = db.Column(db.String(100))
-    in_model = db.Column(db.Boolean, nullable=False, default=True)      # False: thẻ "Sắp có" (hoa sen)
+    in_model = db.Column(db.Boolean, nullable=False, default=True)      # cột cũ (thẻ "Sắp có" của hoa sen), giờ luôn True
 
     def to_dict(self):
         # Giữ đúng tên trường mà frontend đang đọc (scientific, không phải scientific_name)

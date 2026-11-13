@@ -1,4 +1,5 @@
-/* Trang Mô hình: mọi con số đọc từ GET /api/model-info (models/model_info.json + số ảnh trong CSDL).
+/* Trang Mô hình: mọi con số đọc từ GET /api/model-info (models/model_info.json + tên tiếng Việt các lớp trong CSDL).
+   Số ảnh lấy từ num_images trong model_info.json: đúng những ảnh mô hình đang dùng đã học (train) và được chấm (val, test).
    Không gõ số tay ở đây: thay mô hình mới chỉ cần thay file trong models/, trang tự đổi theo.
    Người phụ trách: Nghi */
 
@@ -21,15 +22,17 @@ function showStats(info) {
   $('statAcc').textContent = formatPercent(info.test_accuracy, 1);
   $('statAccSub').textContent = `Mô hình ${info.version} · ${formatNumber(test)} ảnh test`;
 
-  // Số ảnh trong bộ dữ liệu: cộng số ảnh từng loài (lấy từ bảng dataset_images)
-  let tf = 0;
-  let web = 0;
-  for (const flower of info.flowers) {
-    tf += flower.image_counts.tf_flowers;
-    web += flower.image_counts.web;
+  // Số ảnh: tách riêng ảnh lớp "Khác" (nếu mô hình có lớp này)
+  let other = 0;
+  if (info.class_names.includes('other')) {
+    other = info.num_images.train.other + info.num_images.val.other + info.num_images.test.other;
   }
-  $('statImages').textContent = formatNumber(tf + web);
-  $('statImagesSub').textContent = `${formatNumber(tf)} TF Flowers + ${formatNumber(web)} tự thu thập`;
+  $('statImages').textContent = formatNumber(all);
+  if (other > 0) {
+    $('statImagesSub').textContent = `${formatNumber(all - other)} ảnh 5 loài hoa + ${formatNumber(other)} ảnh Khác`;
+  } else {
+    $('statImagesSub').textContent = `${formatNumber(all)} ảnh 5 loài hoa`;
+  }
 
   // Tỉ lệ chia tập, ví dụ "70/15/15"
   const trainPct = Math.round(train / all * 100);
@@ -122,30 +125,37 @@ function showConfusionMatrix(matrix, names) {
       html += `<span class="cm-cell" style="background:${background};color:${color}" title="${formatPercent(ratio, 1)} của hàng">${value}</span>`;
     }
   }
+  $('cm').style.setProperty('--n', names.length);       // số cột của lưới (5 loài hoa + Khác = 6)
   $('cm').innerHTML = html;
 }
 
-// ---------------- Số ảnh theo loài ----------------
-function showImageCounts(flowers) {
-  // Loài nhiều ảnh nhất có thanh dài 100%
+// ---------------- Số ảnh theo lớp ----------------
+// Mỗi lớp một thanh gồm 3 đoạn: train (đậm), validation, test (nhạt)
+function showImageCounts(info, names) {
+  const counts = info.num_images;                       // { train: { daisy: 445, ... }, val: {...}, test: {...} }
+
+  // Lớp nhiều ảnh nhất có thanh dài 100%
   let max = 1;
-  for (const flower of flowers) {
-    const total = flower.image_counts.tf_flowers + flower.image_counts.web;
+  for (const code of info.class_names) {
+    const total = counts.train[code] + counts.val[code] + counts.test[code];
     if (total > max) max = total;
   }
 
   let html = '';
-  for (const flower of flowers) {
-    const tf = flower.image_counts.tf_flowers;
-    const web = flower.image_counts.web;
+  for (let i = 0; i < info.class_names.length; i++) {
+    const code = info.class_names[i];
+    const train = counts.train[code];
+    const val = counts.val[code];
+    const test = counts.test[code];
     html += `
       <div class="count-row">
-        <span class="count-name">${flower.name_vi}</span>
-        <div class="count-bar" title="${formatNumber(tf)} TF Flowers + ${formatNumber(web)} tự thu thập">
-          <div style="width:${tf / max * 100}%;background:var(--forest)"></div>
-          <div style="width:${web / max * 100}%;background:var(--sage-2)"></div>
+        <span class="count-name">${names[i]}</span>
+        <div class="count-bar" title="train ${formatNumber(train)} · validation ${formatNumber(val)} · test ${formatNumber(test)}">
+          <div style="width:${train / max * 100}%;background:var(--forest)"></div>
+          <div style="width:${val / max * 100}%;background:var(--sage-2)"></div>
+          <div style="width:${test / max * 100}%;background:#b9b4a6"></div>
         </div>
-        <span class="num-r">${formatNumber(tf + web)}</span>
+        <span class="num-r">${formatNumber(train + val + test)}</span>
       </div>`;
   }
   $('counts').innerHTML = html;
@@ -181,7 +191,7 @@ async function loadModelInfo() {
     showStats(info);
     showArchitecture(info.architecture);
     showConfusionMatrix(info.confusion_matrix, names);
-    showImageCounts(info.flowers);
+    showImageCounts(info, names);
     showF1(info, names);
     show('content');
     showTrainingChart(info);                            // vẽ sau khi khối đã hiện, để Chart.js đo đúng kích thước

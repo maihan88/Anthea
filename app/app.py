@@ -12,7 +12,7 @@ from sqlalchemy.exc import SQLAlchemyError
 import config
 import model_service
 import storage
-from database import DatasetImage, Flower, Prediction, PredictionScore, db
+from database import Flower, Prediction, PredictionScore, db
 
 app = Flask(__name__)
 app.config.from_object(config)
@@ -22,6 +22,7 @@ PAGES_DIR = Path(__file__).parent / "pages"
 SAMPLES_DIR = Path(__file__).parent / "static" / "samples"     # ảnh mẫu: samples/<mã loài>/*.jpg
 MAX_IMAGE_SIZE = 5 * 1024 * 1024                                # 5 MB
 ALLOWED_TYPES = {"image/jpeg": "jpg", "image/png": "png"}      # kiểu ảnh nhận -> đuôi file
+OTHER_CODE = "other"                                           # lớp "Khác" của mô hình: không phải một loài hoa
 
 
 # ================= CÁC TRANG HTML =================
@@ -64,14 +65,11 @@ def model_page():
 
 # ================= HÀM PHỤ =================
 
-def count_images(flower_id, source):
-    """Số ảnh đã làm sạch (status = kept) của một loài. source: "tf_flowers" hoặc "web"."""
-    query = db.select(db.func.count(DatasetImage.id)).where(
-        DatasetImage.flower_id == flower_id,
-        DatasetImage.source == source,
-        DatasetImage.status == "kept",
-    )
-    return db.session.scalar(query)
+def count_model_images(code):
+    """Số ảnh của một lớp mà mô hình đang dùng đã học: train + val + test trong models/model_info.json.
+    Thay mô hình (v1 -> v2) thì số này tự đổi theo."""
+    num_images = model_service.get_model_info()["num_images"]
+    return num_images["train"][code] + num_images["val"][code] + num_images["test"][code]
 
 
 def get_sample_images(flower_code):
@@ -87,12 +85,9 @@ def get_sample_images(flower_code):
 
 
 def flower_to_json(flower):
-    """Thông tin một loài + số ảnh + ảnh mẫu, cho các trang Thư viện hoa và Mô hình."""
+    """Thông tin một loài + số ảnh mô hình đã học + ảnh mẫu, cho trang Thư viện hoa và Chi tiết loài."""
     data = flower.to_dict()
-    data["image_counts"] = {
-        "tf_flowers": count_images(flower.id, "tf_flowers"),
-        "web": count_images(flower.id, "web"),
-    }
+    data["image_count"] = count_model_images(flower.code)
     data["samples"] = get_sample_images(flower.code)
     return data
 
@@ -106,7 +101,9 @@ def find_flower(code):
 
 @app.route("/api/flowers")
 def api_flowers():
-    flowers = db.session.scalars(db.select(Flower).order_by(Flower.id)).all()
+    # Thư viện hoa chỉ có các loài hoa, không có lớp "Khác"
+    query = db.select(Flower).where(Flower.code != OTHER_CODE).order_by(Flower.id)
+    flowers = db.session.scalars(query).all()
     result = []
     for flower in flowers:
         result.append(flower_to_json(flower))
@@ -116,18 +113,21 @@ def api_flowers():
 @app.route("/api/flowers/<int:flower_id>")
 def api_flower(flower_id):
     flower = db.session.get(Flower, flower_id)
-    if flower is None:
+    if flower is None or flower.code == OTHER_CODE:
         return jsonify(error=f"Không tìm thấy loài hoa #{flower_id}."), 404
     return jsonify(flower_to_json(flower))
 
 
 @app.route("/api/model-info")
 def api_model_info():
-    """Nội dung models/model_info.json, thêm "flowers": các loài theo đúng thứ tự class_names."""
+    """Nội dung models/model_info.json, thêm "flowers": thông tin các lớp (tên tiếng Việt…) theo đúng thứ tự class_names."""
     info = dict(model_service.get_model_info())        # chép ra bản mới, không sửa bản gốc
     flowers = []
     for code in info["class_names"]:
-        flowers.append(flower_to_json(find_flower(code)))
+        flower = find_flower(code)
+        if flower is None:
+            return jsonify(error="CSDL chưa có đủ các lớp của mô hình — hãy chạy python app/seed.py."), 500
+        flowers.append(flower.to_dict())
     info["flowers"] = flowers
     return jsonify(info)
 

@@ -60,13 +60,13 @@
             </div>
           </div>
 
-          <!-- Cột phải: cụm ảnh + thẻ kết quả mẫu -->
+          <!-- Cột phải: cụm ảnh (lấy từ ảnh mẫu trong static/samples/) + thẻ kết quả mẫu -->
           <div class="col-lg-6">
             <div class="hero-visual">
               <div class="hero-collage">
-                <div class="stripe" style="--h:85"><span class="ph-label">[ Ảnh hoa chủ đạo ]</span></div>
-                <div class="stripe" style="--h:345"><span class="ph-label">[ Ảnh hoa phụ ]</span></div>
-                <div class="stripe" style="--h:140"><span class="ph-label">[ Ảnh hoa phụ ]</span></div>
+                <div class="stripe" style="--h:85"><img class="cover" src="/static/samples/sunflowers/sunflower(3).jpg" alt="Hoa hướng dương"></div>
+                <div class="stripe" style="--h:345"><img class="cover" src="/static/samples/tulips/tulip(1).jpg" alt="Hoa tulip"></div>
+                <div class="stripe" style="--h:140"><img class="cover" src="/static/samples/daisy/daisy(1).jpg" alt="Hoa cúc họa mi"></div>
               </div>
               <div class="hero-result">
                 <div class="d-flex align-items-center gap-2">
@@ -75,10 +75,11 @@
                 </div>
                 <div class="d-flex justify-content-between align-items-baseline gap-2">
                   <span class="hero-result-name">Hướng dương</span>
-                  <span class="hero-result-pct">93%</span>
+                  <span class="hero-result-pct">100%</span>
                 </div>
-                <div class="metric-track"><div style="width:93%"></div></div>
-                <span class="mono" style="font-size:11px;color:var(--ink-5)">IMG_2041.jpg · 1,4 giây</span>
+                <div class="metric-track"><div style="width:100%"></div></div>
+                <!-- Kết quả thật của mô hình v1-khac với ảnh hướng dương bên trái -->
+                <span class="mono" style="font-size:11px;color:var(--ink-5)">sunflower(3).jpg</span>
               </div>
             </div>
           </div>
