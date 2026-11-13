@@ -39,6 +39,9 @@ if not USE_FAKE:
     import numpy as np
     import tensorflow as tf
     model = tf.keras.models.load_model(MODELS_DIR / "flower_cnn.keras")
+    # Chạy thử 1 ảnh đen: lần dự đoán đầu tiên của TensorFlow luôn chậm (~0,7 s),
+    # làm trước lúc khởi động để người dùng đầu tiên không phải chờ
+    model.predict(np.zeros((1, *IMG_SIZE, 3), dtype="float32"), verbose=0)
 
 
 # ---------------- Các bước xử lý ----------------
