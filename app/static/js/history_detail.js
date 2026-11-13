@@ -21,10 +21,15 @@ function showPrediction(item) {
   // Cột phải: kết quả
   $('dot').style.setProperty('--h', flower.hue);
   $('nameVi').textContent = flower.name_vi;
-  $('nameEn').textContent = flower.name_en + ' · ' + flower.scientific;
+  if (flower.code === 'other') {
+    $('nameEn').textContent = 'Không thuộc 5 loài Anthea nhận diện';   // lớp "Khác": không có tên khoa học
+  } else {
+    $('nameEn').textContent = flower.name_en + ' · ' + flower.scientific;
+  }
   $('pct').textContent = formatPercent(item.confidence);
   $('top3').innerHTML = top3Html(item.top, item.uncertain);
   $('flowerLink').href = '/flowers/' + flower.id;
+  if (flower.code === 'other') hide('flowerLink');       // lớp "Khác" không có trang thông tin loài
 
   if (item.uncertain) {
     $('pct').classList.add('low');

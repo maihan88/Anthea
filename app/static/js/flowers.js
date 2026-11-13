@@ -8,24 +8,14 @@ function flowerCardHtml(flower) {
     image = `<img class="cover" src="${flower.samples[0]}" alt="" loading="lazy">`;
   }
 
-  // Loài đã có trong mô hình: bấm vào xem chi tiết.
-  // Loài chưa có (hoa sen, in_model = false): thẻ mờ "Sắp có", không bấm được.
-  let cardClass = 'flower-card';
-  let link = `href="/flowers/${flower.id}"`;
-  let badge = formatNumber(flower.image_counts.tf_flowers + flower.image_counts.web) + ' ảnh';
-  if (!flower.in_model) {
-    cardClass = 'flower-card soon';
-    link = '';
-    badge = 'Sắp có';
-  }
 
   return `
     <div class="col-sm-6 col-lg-4 col-xl-3">
-      <a class="${cardClass}" ${link}>
+      <a class="flower-card" href="/flowers/${flower.id}">
         <span class="flower-thumb stripe" style="--h:${flower.hue}">
           ${image}
           <span class="ph-label">[ Ảnh ${flower.name_vi.toLowerCase()} ]</span>
-          <span class="flower-badge">${badge}</span>
+          <span class="flower-badge">${formatNumber(flower.image_count)} ảnh</span>
         </span>
         <span class="flower-meta">
           <span class="d-flex flex-column gap-1">

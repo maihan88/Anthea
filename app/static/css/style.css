@@ -245,7 +245,6 @@ main { flex: 1; }
   color: var(--ink); text-decoration: none; transition: transform .25s, box-shadow .25s;
 }
 a.flower-card:hover { color: var(--ink); transform: translateY(-3px); box-shadow: 0 20px 40px -24px rgba(31, 42, 34, .35); }
-.flower-card.soon { opacity: .6; }
 .flower-thumb { position: relative; aspect-ratio: 4 / 5; border-radius: 18px; overflow: hidden; display: grid; place-items: center; }
 .flower-badge { position: absolute; top: 12px; left: 12px; background: rgba(251, 250, 246, .92); padding: 5px 11px; border-radius: 999px; font-size: 12px; font-weight: 500; }
 .flower-meta { padding: 16px 10px 10px; display: flex; justify-content: space-between; align-items: flex-end; gap: 10px; }

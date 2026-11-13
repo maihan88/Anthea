@@ -41,7 +41,8 @@
         </div>
       </div>
 
-      <div class="row g-4">
+      <!-- justify-content-center: lúc chưa chọn ảnh chỉ có khung ảnh, nằm giữa trang -->
+      <div class="row g-4 justify-content-center">
         <!-- ============ CỘT TRÁI: KHUNG ẢNH ============ -->
         <div class="col-lg-6">
           <div class="upload-card h-100">
@@ -84,44 +85,9 @@
           </div>
         </div>
 
-        <!-- ============ CỘT PHẢI: HƯỚNG DẪN / KẾT QUẢ ============ -->
-        <div class="col-lg-6">
+        <!-- ============ CỘT PHẢI: KẾT QUẢ (ẩn khi chưa chọn ảnh) ============ -->
+        <div id="sideCol" class="col-lg-6 d-none">
           <div class="side-panel h-100">
-
-            <!-- Trạng thái empty: mẹo chụp ảnh -->
-            <div id="tipsPanel" class="d-flex flex-column gap-2">
-              <span class="eyebrow">Để có kết quả tốt nhất</span>
-              <ol class="tips">
-                <li>
-                  <span class="num">01</span>
-                  <div>
-                    <strong>Chụp cận bông hoa</strong>
-                    <!-- <span>Bông hoa nên chiếm phần lớn khung hình, tránh chụp cả bó.</span> -->
-                  </div>
-                </li>
-                <li>
-                  <span class="num">02</span>
-                  <div>
-                    <strong>Đủ sáng, không nhòe</strong>
-                    <!-- <span>Ánh sáng tự nhiên giữ màu cánh hoa chính xác nhất.</span> -->
-                  </div>
-                </li>
-                <li>
-                  <span class="num">03</span>
-                  <div>
-                    <strong>Thuộc 5 loài Anthea biết</strong>
-                    <!-- <span>Ảnh loài khác có thể cho kết quả "chưa chắc chắn".</span> -->
-                  </div>
-                </li>
-              </ol>
-              <div class="d-flex flex-wrap gap-2 pt-2">
-                <a class="chip" href="/flowers/3"><span class="dot" style="--h:10"></span>Hoa hồng</a>
-                <a class="chip" href="/flowers/4"><span class="dot" style="--h:85"></span>Hướng dương</a>
-                <a class="chip" href="/flowers/1"><span class="dot" style="--h:140"></span>Cúc họa mi</a>
-                <a class="chip" href="/flowers/5"><span class="dot" style="--h:345"></span>Tulip</a>
-                <a class="chip" href="/flowers/2"><span class="dot" style="--h:60"></span>Bồ công anh</a>
-              </div>
-            </div>
 
             <!-- Trạng thái chosen: tên ảnh + nút Phân loại -->
             <div id="previewBar" class="preview-bar p-0 d-none">
@@ -160,6 +126,11 @@
                   <div id="resPct" class="result-pct"></div>
                   <div style="font-size:12px;color:var(--ink-5);margin-top:4px">độ tin cậy</div>
                 </div>
+              </div>
+              <!-- Chỉ hiện khi mô hình đoán là lớp "Khác" -->
+              <div id="resOther" class="notice d-none">
+                <span class="notice-icon">!</span>
+                <div><strong style="font-weight:600">Không phải hoa cần nhận diện.</strong> Ảnh này không phải hoa, hoặc là hoa ngoài 5 loài Anthea đã học (cúc họa mi, bồ công anh, hoa hồng, hướng dương, tulip).</div>
               </div>
               <!-- Chỉ hiện khi độ tin cậy dưới ngưỡng -->
               <div id="resUnsure" class="notice d-none">

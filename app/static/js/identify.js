@@ -8,7 +8,8 @@
 const MAX_SIZE = 5 * 1024 * 1024;                       // 5 MB
 const ALLOWED_TYPES = ['image/jpeg', 'image/png'];
 // 4 bước hiện trong lúc chờ, khớp kiến trúc mô hình (models/model_info.json → architecture)
-const STEPS = ['Resize 180×180 · chuẩn hoá 0–1', '4 khối Conv · trích đặc trưng', 'GlobalAveragePooling', 'Softmax · 5 loài hoa'];
+const STEPS = ['Resize 180×180 · chuẩn hoá 0–1', '4 khối Conv · trích đặc trưng', 'GlobalAveragePooling', 'Softmax · 5 loài hoa + Khác'];
+const OTHER_CODE = 'other';                             // lớp "Khác" của mô hình: không phải hoa, hoặc hoa ngoài 5 loài
 
 let currentFile = null;                                 // ảnh đang chọn
 
@@ -22,7 +23,7 @@ function setVisible(id, visible) {
 
 function setState(state) {
   setVisible('dropZone', state === 'empty');
-  setVisible('tipsPanel', state === 'empty');
+  setVisible('sideCol', state !== 'empty');             // chưa chọn ảnh: chỉ còn khung ảnh ở giữa
   setVisible('imageBox', state !== 'empty');
   setVisible('previewBar', state === 'chosen');
   setVisible('analyzing', state === 'analyzing');
@@ -77,9 +78,7 @@ async function pickSample() {
     const flowers = await callApi('/api/flowers');
     const samples = [];
     for (const flower of flowers) {
-      if (flower.in_model) {
-        for (const url of flower.samples) samples.push(url);
-      }
+      for (const url of flower.samples) samples.push(url);
     }
     if (samples.length === 0) {
       showDropError('Chưa có ảnh mẫu — hãy chép vài ảnh vào app/static/samples/<mã loài>/.');
@@ -144,8 +143,8 @@ async function classify() {
 
   try {
     const data = await request;                          // giờ mới chờ kết quả
-    showResult(data);
     setState('result');
+    showResult(data);                                    // sau setState, vì kết quả "Khác" cần ẩn bớt vài khối
   } catch (error) {
     setState('chosen');
     $('predictErrorText').textContent = error.message;
@@ -158,21 +157,35 @@ function showResult(data) {
   const best = data.top[0];                              // loài có độ tin cậy cao nhất
 
   $('resName').textContent = best.name_vi;
-  $('resEn').textContent = best.name_en + ' · ' + best.scientific;
   $('resPct').textContent = formatPercent(best.confidence);
   $('resTop3').innerHTML = top3Html(data.top, data.uncertain);
   $('resHistLink').href = '/history/' + data.history_id;
-  $('resLink').href = '/flowers/' + best.id;
   $('fileTagDot').style.setProperty('--h', best.hue);
+
+  // Ẩn hết các khối thông báo của lần trước, rồi chỉ hiện khối đúng với kết quả lần này
+  hide('resOther');
+  hide('resUnsure');
+  $('resPct').classList.remove('low');
+
+  // Trường hợp 1: mô hình đoán "Khác" -> báo không phải hoa cần nhận diện, không có thông tin loài để xem
+  if (best.code === OTHER_CODE) {
+    $('resEn').textContent = 'Không thuộc 5 loài Anthea nhận diện';
+    show('resOther');
+    hide('resLink');
+    hide('aboutSection');
+    return;
+  }
+
+  // Trường hợp 2: là một trong 5 loài hoa
+  $('resEn').textContent = best.name_en + ' · ' + best.scientific;
+  $('resLink').href = '/flowers/' + best.id;
+  show('resLink');
 
   // Dưới ngưỡng: số màu cam + khối "Chưa chắc chắn"
   if (data.uncertain) {
     $('resPct').classList.add('low');
     $('resThreshold').textContent = formatPercent(data.threshold);
     show('resUnsure');
-  } else {
-    $('resPct').classList.remove('low');
-    hide('resUnsure');
   }
 
   // Khối "Về loài hoa này"
