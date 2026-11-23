@@ -19,4 +19,7 @@ app/static/uploads/*
 Thumbs.db
 .DS_Store
 .vscode/
-.claude/settings.local.json
+.claude/
+
+# Báo cáo đồ án: để trên Google Drive, không đẩy lên GitHub
+report/
