@@ -118,7 +118,8 @@ function showStep(step) {
   }
   $('stepList').innerHTML = html;
 
-  const percent = (step + 1) * 25;
+  // 20% → 80%: chưa bao giờ hiện 100% khi máy chủ chưa trả kết quả
+  const percent = (step + 1) * 20;
   $('analyzePct').textContent = percent + '%';
   $('progressBar').style.width = percent + '%';
   $('scanLine').style.top = (percent * 0.9) + '%';      // vạch quét chạy dần xuống dưới ảnh
@@ -135,11 +136,14 @@ async function classify() {
   formData.append('image', currentFile);
   const request = callApi('/api/predict', 'POST', formData);
 
-  // Hiệu ứng 4 bước, mỗi bước 0,3 giây
-  for (let step = 0; step < STEPS.length; step++) {
+  // Hiệu ứng: 3 bước đầu, mỗi bước 0,3 giây
+  const lastStep = STEPS.length - 1;
+  for (let step = 0; step < lastStep; step++) {
     showStep(step);
     await wait(300);
   }
+  // Bước cuối đứng "đang chạy" (nhấp nháy) cho tới khi máy chủ trả kết quả
+  showStep(lastStep);
 
   try {
     const data = await request;                          // giờ mới chờ kết quả

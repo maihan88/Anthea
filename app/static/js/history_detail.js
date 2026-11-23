@@ -11,7 +11,6 @@ function showPrediction(item) {
   $('imageBox').style.setProperty('--h', flower.hue);
   $('image').src = item.image_url;
   $('image').alt = 'Ảnh đã tải lên: ' + item.original_name;
-  $('code').textContent = '#' + item.id;
   $('metaTime').textContent = formatDateTime(item.created_at);
   $('metaFile').textContent = item.original_name;
   $('metaSize').textContent = formatSize(item.file_size);
