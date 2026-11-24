@@ -21,7 +21,6 @@ SPLITS = ["train", "val", "test"]
 FLOWERS = json.loads((BASE / "models" / "class_names.json").read_text(encoding="utf-8"))
 IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"}
 
-# Cột 1–9 trùng tên cột bảng dataset_images (flower là mã loài, import_manifest.py đổi sang flower_id).
 # raw_file: ảnh web lấy từ file nào trong data/raw/, để clean.py chạy lại không xử lý lại ảnh cũ.
 COLUMNS = ["filename", "flower", "source", "keyword", "width", "height", "phash", "status", "split", "raw_file"]
 

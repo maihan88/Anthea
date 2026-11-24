@@ -1,9 +1,3 @@
-"""Flask: gửi các trang HTML + REST API.
-Người phụ trách: Nghi
-
-Các trang trong app/pages/ là HTML tĩnh (không dùng Jinja): Flask chỉ gửi nguyên file.
-Dữ liệu do JavaScript trong trang tự gọi các đường /api/... (trả về JSON) rồi điền vào.
-"""
 from pathlib import Path
 
 from flask import Flask, jsonify, request, send_from_directory
@@ -19,13 +13,11 @@ app.config.from_object(config)
 db.init_app(app)
 
 PAGES_DIR = Path(__file__).parent / "pages"
-SAMPLES_DIR = Path(__file__).parent / "static" / "samples"     # ảnh mẫu: samples/<mã loài>/*.jpg
-MAX_IMAGE_SIZE = 5 * 1024 * 1024                                # 5 MB
-ALLOWED_TYPES = {"image/jpeg": "jpg", "image/png": "png"}      # kiểu ảnh nhận -> đuôi file
-OTHER_CODE = "other"                                           # lớp "Khác" của mô hình: không phải một loài hoa
+SAMPLES_DIR = Path(__file__).parent / "static" / "samples"
+MAX_IMAGE_SIZE = 5 * 1024 * 1024
+ALLOWED_TYPES = ["image/jpeg", "image/png"]
+OTHER_CODE = "other"
 
-
-# ================= CÁC TRANG HTML =================
 
 @app.route("/")
 def index_page():
@@ -44,7 +36,6 @@ def flowers_page():
 
 @app.route("/flowers/<int:flower_id>")
 def flower_detail_page(flower_id):
-    # Cùng một file cho mọi id: JS đọc id trên thanh địa chỉ rồi gọi /api/flowers/<id>
     return send_from_directory(PAGES_DIR, "flower_detail.html")
 
 
@@ -63,17 +54,12 @@ def model_page():
     return send_from_directory(PAGES_DIR, "model.html")
 
 
-# ================= HÀM PHỤ =================
-
 def count_model_images(code):
-    """Số ảnh của một lớp mà mô hình đang dùng đã học: train + val + test trong models/model_info.json.
-    Thay mô hình (v1 -> v2) thì số này tự đổi theo."""
     num_images = model_service.get_model_info()["num_images"]
     return num_images["train"][code] + num_images["val"][code] + num_images["test"][code]
 
 
 def get_sample_images(flower_code):
-    """Link các ảnh mẫu trong static/samples/<mã loài>/. Chưa có thư mục thì trả về list rỗng."""
     folder = SAMPLES_DIR / flower_code
     if not folder.is_dir():
         return []
@@ -85,7 +71,6 @@ def get_sample_images(flower_code):
 
 
 def flower_to_json(flower):
-    """Thông tin một loài + số ảnh mô hình đã học + ảnh mẫu, cho trang Thư viện hoa và Chi tiết loài."""
     data = flower.to_dict()
     data["image_count"] = count_model_images(flower.code)
     data["samples"] = get_sample_images(flower.code)
@@ -93,15 +78,11 @@ def flower_to_json(flower):
 
 
 def find_flower(code):
-    """Tìm loài theo mã lớp của mô hình ("roses", "tulips"…). Không có thì trả về None."""
     return db.session.scalar(db.select(Flower).where(Flower.code == code))
 
 
-# ================= API: LOÀI HOA & MÔ HÌNH =================
-
 @app.route("/api/flowers")
 def api_flowers():
-    # Thư viện hoa chỉ có các loài hoa, không có lớp "Khác"
     query = db.select(Flower).where(Flower.code != OTHER_CODE).order_by(Flower.id)
     flowers = db.session.scalars(query).all()
     result = []
@@ -120,8 +101,8 @@ def api_flower(flower_id):
 
 @app.route("/api/model-info")
 def api_model_info():
-    """Nội dung models/model_info.json, thêm "flowers": thông tin các lớp (tên tiếng Việt…) theo đúng thứ tự class_names."""
-    info = dict(model_service.get_model_info())        # chép ra bản mới, không sửa bản gốc
+    # Chép ra một dict mới rồi mới thêm "flowers", để không sửa vào thông tin gốc của mô hình
+    info = dict(model_service.get_model_info())
     flowers = []
     for code in info["class_names"]:
         flower = find_flower(code)
@@ -132,12 +113,9 @@ def api_model_info():
     return jsonify(info)
 
 
-# ================= API: LỊCH SỬ =================
-
 @app.route("/api/history")
 def api_history():
-    """Các lần phân loại, mới nhất trước. /api/history?limit=4 thì chỉ lấy 4 mục."""
-    limit = request.args.get("limit", type=int)        # không có ?limit= thì là None
+    limit = request.args.get("limit", type=int)
     query = db.select(Prediction).order_by(Prediction.id.desc())
     if limit:
         query = query.limit(limit)
@@ -164,9 +142,9 @@ def api_history_delete(prediction_id):
         return jsonify(error=f"Không tìm thấy mục #{prediction_id} — có thể đã bị xóa."), 404
 
     image_id = prediction.image_id
-    db.session.delete(prediction)              # 3 dòng prediction_scores tự xóa theo (ON DELETE CASCADE)
+    db.session.delete(prediction)
     db.session.commit()
-    storage.delete_image(image_id)             # xóa dòng trong CSDL trước, rồi mới xóa ảnh
+    storage.delete_image(image_id)
     return jsonify(deleted=1)
 
 
@@ -184,8 +162,6 @@ def api_history_delete_all():
     return jsonify(deleted=len(image_ids))
 
 
-# ================= API: PHÂN LOẠI ẢNH =================
-
 @app.route("/api/predict", methods=["POST"])
 def api_predict():
     # Bước 1: kiểm tra ảnh gửi lên
@@ -198,13 +174,13 @@ def api_predict():
     if len(image_bytes) > MAX_IMAGE_SIZE:
         return jsonify(error="Ảnh vượt giới hạn 5 MB."), 400
 
-    # Bước 2: mô hình CNN phân loại -> top 3, ví dụ [{"code": "roses", "confidence": 0.91}, ...]
+    # Bước 2: mô hình đoán top 3, ví dụ [{"code": "roses", "confidence": 0.91}, ...]
     try:
         top = model_service.predict(image_bytes)
     except ValueError:
         return jsonify(error="Không đọc được ảnh."), 400
 
-    # Bước 3: tìm thông tin 3 loài trong CSDL
+    # Bước 3: lấy thông tin 3 loài trong CSDL
     flowers = []
     for item in top:
         flower = find_flower(item["code"])
@@ -214,7 +190,7 @@ def api_predict():
 
     # Bước 4: lưu ảnh lên Cloudinary
     try:
-        image_url, image_id = storage.save_image(image_bytes, ALLOWED_TYPES[file.mimetype])
+        image_url, image_id = storage.save_image(image_bytes)
     except Exception:
         app.logger.exception("Không lưu được ảnh")
         return jsonify(error="Không tải được ảnh lên Cloudinary — kiểm tra mạng và CLOUDINARY_URL trong .env."), 500
@@ -223,7 +199,7 @@ def api_predict():
     info = model_service.get_model_info()
     threshold = info["uncertain_threshold"]
     prediction = Prediction(
-        flower=flowers[0],                     # loài đứng đầu
+        flower=flowers[0],
         confidence=top[0]["confidence"],
         image_url=image_url,
         image_id=image_id,
@@ -233,14 +209,15 @@ def api_predict():
         threshold=threshold,
     )
     for i in range(len(top)):
-        prediction.scores.append(PredictionScore(ranking=i + 1, flower=flowers[i], confidence=top[i]["confidence"]))
+        score = PredictionScore(ranking=i + 1, flower=flowers[i], confidence=top[i]["confidence"])
+        prediction.scores.append(score)
 
     try:
         db.session.add(prediction)
         db.session.commit()
     except SQLAlchemyError:
         db.session.rollback()
-        storage.delete_image(image_id)         # không lưu được lịch sử thì xóa luôn ảnh vừa tải lên
+        storage.delete_image(image_id)
         app.logger.exception("Không lưu được lịch sử")
         return jsonify(error="Không lưu được lịch sử — kiểm tra MySQL đã chạy chưa."), 500
 
@@ -255,16 +232,13 @@ def api_predict():
     return jsonify(
         top=results,
         threshold=threshold,
-        uncertain=top[0]["confidence"] < threshold,    # độ tin cậy dưới ngưỡng -> "chưa chắc chắn"
+        uncertain=top[0]["confidence"] < threshold,
         history_id=prediction.id,
     )
 
 
-# ================= BẮT LỖI =================
-
 @app.errorhandler(404)
 def not_found(error):
-    # Đường /api/... trả JSON để JavaScript đọc được; trang thường thì hiện trang 404
     if request.path.startswith("/api/"):
         return jsonify(error="Không tìm thấy địa chỉ API này."), 404
     return send_from_directory(PAGES_DIR, "404.html"), 404
@@ -272,7 +246,6 @@ def not_found(error):
 
 @app.errorhandler(SQLAlchemyError)
 def database_error(error):
-    # MySQL chưa chạy hoặc truy vấn lỗi: báo câu tiếng Việt thay vì trang lỗi
     db.session.rollback()
     app.logger.exception("Lỗi CSDL")
     return jsonify(error="Không đọc/ghi được CSDL — kiểm tra MySQL đã chạy chưa."), 500

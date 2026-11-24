@@ -1,12 +1,9 @@
-/* Trang Lịch sử: các lần phân loại (mới nhất trước), xóa từng mục hoặc toàn bộ. Người phụ trách: Nghi */
-
-// HTML một dòng của bảng. item là một mục của GET /api/history
 function historyRowHtml(item) {
-  const fileName = escapeHtml(item.original_name);     // tên do người dùng đặt: phải escape
+  const fileName = escapeHtml(item.original_name);
 
   let badge = '';
   let barClass = 'conf-fill';
-  if (item.uncertain) {                                 // dưới ngưỡng của chính lần phân loại đó
+  if (item.uncertain) {
     badge = '<span class="badge-unsure">Chưa chắc chắn</span>';
     barClass = 'conf-fill low';
   }
@@ -58,7 +55,6 @@ async function loadHistory() {
     $('historyBody').innerHTML = html;
     $('countLabel').textContent = formatNumber(items.length) + ' lần phân loại';
 
-    // Có mục thì hiện bảng + nút "Xóa toàn bộ"; không có thì hiện khối "Chưa có lịch sử"
     if (items.length > 0) {
       show('historyWrap');
       show('btnClearAll');
@@ -74,7 +70,6 @@ async function loadHistory() {
   }
 }
 
-// Nút thùng rác ở mỗi dòng gọi hàm này (onclick trong historyRowHtml)
 function deleteOne(id) {
   askConfirm('Xóa mục này?', 'Kết quả này và ảnh đã tải lên sẽ bị xóa. Không thể hoàn tác.', async function () {
     try {
@@ -83,7 +78,7 @@ function deleteOne(id) {
       showLoadError('Chưa xóa được. ' + error.message);
       return;
     }
-    loadHistory();                                    // tải lại bảng cho khớp với CSDL
+    loadHistory();
   });
 }
 

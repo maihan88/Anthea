@@ -1,6 +1,3 @@
-/* =========================================================
-   Anthea – giao diện chung (đi kèm Bootstrap 5)
-   ========================================================= */
 :root {
   --bg: #f5f3ec;
   --card: #fbfaf6;
@@ -60,7 +57,6 @@ main { flex: 1; }
 .page-title em, .hero-title em { color: var(--forest); }
 .muted { color: var(--ink-3); }
 
-/* ---------- Nút (dựa trên .btn của Bootstrap) ---------- */
 .btn {
   --bs-btn-border-radius: 999px;
   --bs-btn-padding-x: 22px;
@@ -92,7 +88,6 @@ main { flex: 1; }
 .btn-sm-pill { --bs-btn-padding-x: 20px; --bs-btn-padding-y: 10px; --bs-btn-font-size: 14px; min-height: 44px; }
 .btn-lg-pill { --bs-btn-padding-x: 24px; --bs-btn-padding-y: 13px; --bs-btn-font-size: 15px; min-height: 48px; }
 
-/* ---------- Header ---------- */
 .site-header {
   position: sticky; top: 0; z-index: 30;
   background: rgba(245, 243, 236, .88);
@@ -114,28 +109,22 @@ main { flex: 1; }
 .main-nav a.active { background: var(--card); color: var(--ink); box-shadow: 0 1px 3px rgba(31, 42, 34, .12); }
 
 @media (max-width: 767.98px) {
-  /* 5 mục không vừa một hàng: cho menu cuộn ngang */
   .main-nav { width: 100%; margin-left: 0; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
   .main-nav::-webkit-scrollbar { display: none; }
   .main-nav a { padding: 9px 14px; flex: 0 0 auto; white-space: nowrap; font-size: 13px; }
 }
 
-/* ---------- Footer ---------- */
 .site-footer { border-top: 1px solid var(--line); }
 .site-footer .wrap { padding-top: 24px; padding-bottom: 24px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-size: 13px; color: var(--ink-5); }
 .site-footer em { font-family: var(--serif); font-size: 16px; color: var(--ink); }
 
-/* ---------- Thẻ chung ---------- */
 .panel { background: var(--card); border: 1px solid var(--line); border-radius: 24px; }
 .stripe { background: repeating-linear-gradient(135deg, oklch(0.93 0.03 var(--h, 140)) 0 12px, oklch(0.9 0.035 var(--h, 140)) 12px 24px); }
 .dot { width: 12px; height: 12px; border-radius: 50%; background: oklch(0.74 0.1 var(--h, 140)); flex: none; display: inline-block; }
-.ph-label { font-family: var(--mono); font-size: 11px; color: #3c463d; }
 .cover { width: 100%; height: 100%; object-fit: cover; display: block; }
-.cover:not([src]) { display: none; }  /* <img> chưa có ảnh thì ẩn */
-/* Ảnh thật phủ lên khung sọc; chưa có ảnh (hoặc ảnh lỗi bị JS gỡ src) thì khung sọc và nhãn [ … ] hiện ra */
+.cover:not([src]) { display: none; }
 .flower-thumb img.cover, .detail-gallery img.cover, .history-thumb img.cover, .recent-thumb img.cover { position: absolute; inset: 0; }
-.flower-thumb img.cover[src] ~ .ph-label, .detail-gallery img.cover[src] ~ .ph-label { display: none; }
-.load-error { margin: 0; }  /* .upload-error dùng làm khung báo lỗi tải dữ liệu, bỏ lề của trang Nhận diện */
+.load-error { margin: 0; }
 
 .notice {
   display: flex; gap: 12px; align-items: flex-start;
@@ -144,9 +133,6 @@ main { flex: 1; }
 }
 .notice-icon { flex: none; width: 20px; height: 20px; border-radius: 50%; background: var(--warn-icon); color: #fff; display: grid; place-items: center; font-size: 12px; font-weight: 600; margin-top: 1px; }
 
-/* =========================================================
-   Trang Nhận diện (index)
-   ========================================================= */
 .hero { position: relative; overflow: hidden; }
 .hero-blob-1 { position: absolute; width: 640px; height: 640px; border-radius: 50%; background: var(--sage); right: -180px; top: -200px; }
 .hero .wrap { position: relative; padding-top: 64px; padding-bottom: 80px; }
@@ -188,10 +174,9 @@ main { flex: 1; }
 .image-box { position: relative; border-radius: 20px; overflow: hidden; aspect-ratio: 4 / 3; }
 .file-tag { position: absolute; top: 14px; left: 14px; display: flex; align-items: center; gap: 7px; background: rgba(251, 250, 246, .92); padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 500; max-width: calc(100% - 28px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .file-tag .dot { width: 8px; height: 8px; }
-.img-placeholder { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--mono); font-size: 12px; color: var(--ink-2); }
 
 .analyzing { position: absolute; inset: 0; background: rgba(31, 42, 34, .45); display: flex; flex-direction: column; justify-content: flex-end; padding: 22px; gap: 12px; color: #f5f3ec; }
-.scan-line { position: absolute; left: 0; right: 0; top: 8%; height: 2px; background: var(--sage); box-shadow: 0 0 18px 4px rgba(228, 233, 220, .6); transition: top .16s linear; }  /* identify.js cho vạch chạy theo % tiến độ */
+.scan-line { position: absolute; left: 0; right: 0; top: 8%; height: 2px; background: var(--sage); box-shadow: 0 0 18px 4px rgba(228, 233, 220, .6); transition: top .16s linear; }
 .analyzing-title { font-family: var(--serif); font-size: 26px; font-style: italic; }
 .analyzing-step { font-family: var(--mono); font-size: 12px; opacity: .85; }
 .analyzing-track { height: 4px; background: rgba(245, 243, 236, .25); border-radius: 4px; overflow: hidden; }
@@ -236,9 +221,6 @@ main { flex: 1; }
 .step-card p { margin: 0; font-size: 15px; line-height: 1.55; color: var(--ink-3); }
 .step-card.accent p { color: #3f4b41; }
 
-/* =========================================================
-   Thư viện hoa
-   ========================================================= */
 .flower-card {
   display: flex; flex-direction: column; height: 100%;
   background: var(--card); border: 1px solid var(--line); border-radius: 24px; padding: 10px;
@@ -252,7 +234,7 @@ a.flower-card:hover { color: var(--ink); transform: translateY(-3px); box-shadow
 .flower-en { font-family: var(--serif); font-style: italic; font-size: 15px; color: var(--ink-4); }
 .flower-meta .dot { width: 14px; height: 14px; margin-bottom: 6px; }
 
-.back-link { position: relative; z-index: 2; font-size: 14px; text-decoration: none; align-self: flex-start; padding: 10px 0; }  /* nổi trên lề âm của .row bên dưới để bấm được */
+.back-link { position: relative; z-index: 2; font-size: 14px; text-decoration: none; align-self: flex-start; padding: 10px 0; }
 .detail-gallery { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .detail-gallery > div { position: relative; border-radius: 18px; overflow: hidden; aspect-ratio: 1; display: grid; place-items: center; }
 .detail-gallery > div:first-child { grid-column: span 2; aspect-ratio: 4 / 3; border-radius: 24px; }
@@ -265,9 +247,6 @@ a.flower-card:hover { color: var(--ink); transform: translateY(-3px); box-shadow
 .info-rows dd { margin: 0; font-size: 16px; line-height: 1.55; text-wrap: pretty; }
 @media (max-width: 575.98px) { .info-rows > div { grid-template-columns: 1fr; gap: 4px; } }
 
-/* =========================================================
-   Lịch sử (theo bản mới)
-   ========================================================= */
 .history-card { background: var(--card); border: 1px solid rgba(31, 42, 34, .09); border-radius: 24px; padding: 8px; }
 .history-card .table-responsive { position: relative; }
 .history-table { --bs-table-bg: transparent; --bs-table-hover-bg: #f3f1ea; --bs-table-hover-color: var(--ink); --bs-table-color: var(--ink); margin: 0; min-width: 680px; font-size: 14px; }
@@ -305,9 +284,6 @@ a.flower-card:hover { color: var(--ink); transform: translateY(-3px); box-shadow
 .anthea-modal p { margin: 0; font-size: 15px; line-height: 1.55; color: var(--ink-2); }
 .modal-backdrop { --bs-backdrop-bg: #1f2a22; --bs-backdrop-opacity: .45; }
 
-/* =========================================================
-   Mô hình
-   ========================================================= */
 .stat { height: 100%; border-radius: 22px; padding: 24px; display: flex; flex-direction: column; gap: 10px; background: var(--card); border: 1px solid var(--line); }
 .stat.dark { background: var(--forest); color: #f5f3ec; border-color: var(--forest); }
 .stat-label { font-size: 13px; color: var(--ink-4); }
@@ -334,9 +310,6 @@ a.flower-card:hover { color: var(--ink); transform: translateY(-3px); box-shadow
 .cmp-row { display: grid; grid-template-columns: 110px minmax(0, 1fr) 92px; align-items: center; gap: 12px; font-size: 14px; }
 .num-r { font-family: var(--mono); font-size: 12px; text-align: right; color: var(--ink-2); }
 
-/* =========================================================
-   Trang chủ: cụm ảnh, thẻ kết quả mẫu, nhận diện gần đây
-   ========================================================= */
 .hero-visual { position: relative; padding-bottom: 36px; }
 .hero-collage { display: grid; grid-template-columns: 1.25fr 1fr; grid-template-rows: 230px 230px; gap: 12px; }
 .hero-collage > div { overflow: hidden; display: grid; place-items: center; }
@@ -359,9 +332,6 @@ a.flower-card:hover { color: var(--ink); transform: translateY(-3px); box-shadow
 .recent-pct { font-family: var(--mono); font-size: 14px; color: var(--forest); }
 .recent-pct.low { color: var(--clay-text); }
 
-/* =========================================================
-   Trang Nhận diện: cột hướng dẫn / kết quả
-   ========================================================= */
 .side-panel { background: var(--card); border: 1px solid rgba(31, 42, 34, .09); border-radius: 28px; padding: 28px; display: flex; flex-direction: column; gap: 20px; }
 .tips { list-style: none; margin: 8px 0 0; padding: 0; border-top: 1px solid rgba(31, 42, 34, .1); }
 .tips li { display: grid; grid-template-columns: 28px 1fr; gap: 12px; padding: 16px 0; border-bottom: 1px solid rgba(31, 42, 34, .1); }
@@ -375,20 +345,16 @@ a.flower-card:hover { color: var(--ink); transform: translateY(-3px); box-shadow
 .a-steps li span { flex: none; width: 24px; height: 24px; border-radius: 50%; background: #e2dfd5; color: var(--ink-5); display: grid; place-items: center; font-size: 12px; font-family: var(--mono); transition: background .2s; }
 .a-steps li.done, .a-steps li.current { color: var(--ink); }
 .a-steps li.done span { background: var(--forest); color: #f5f3ec; }
-.a-steps li.current span { background: var(--clay-bar); color: #f5f3ec; animation: step-pulse 1s ease-in-out infinite; }  /* nhấp nháy: đang chạy */
+.a-steps li.current span { background: var(--clay-bar); color: #f5f3ec; animation: step-pulse 1s ease-in-out infinite; }
 @keyframes step-pulse { 50% { opacity: .35; } }
 .saved-row { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--ink-3); border-top: 1px solid rgba(31, 42, 34, .1); padding-top: 16px; }
 .saved-check { width: 18px; height: 18px; border-radius: 50%; background: var(--sage); color: var(--forest); display: grid; place-items: center; font-size: 11px; }
 .saved-row a { margin-left: auto; text-underline-offset: 4px; }
 
-/* =========================================================
-   Lịch sử: nút xem chi tiết + trang chi tiết (/history/<id>)
-   ========================================================= */
 .btn-view-one { width: 44px; height: 44px; border-radius: 50%; border: 1px solid rgba(31, 42, 34, .14); color: var(--forest); display: inline-grid; place-items: center; }
 .btn-view-one:hover { background: var(--sage); border-color: transparent; color: var(--forest); }
 .hist-image { position: relative; aspect-ratio: 4 / 3; border-radius: 24px; overflow: hidden; display: grid; place-items: center; }
 .hist-image img.cover { position: absolute; inset: 0; }
-.hist-image img.cover[src] ~ .ph-label { display: none; }
 .meta-rows { margin: 0; border-top: 1px solid rgba(31, 42, 34, .1); }
 .meta-rows > div { display: grid; grid-template-columns: 130px 1fr; gap: 16px; padding: 14px 0; border-bottom: 1px solid rgba(31, 42, 34, .1); }
 .meta-rows dt { font-size: 13px; font-weight: 400; color: var(--ink-5); }

@@ -7,7 +7,7 @@ Làm 5 việc theo thứ tự:
   3. data/combined/train = TF train + web train, data/combined/val = TF val + web val.
      Không gộp test: giữ riêng TF test (so v1 với v2 công bằng) và web test ("ảnh thực tế").
   4. Nén data/combined.zip và data/web_test.zip để đưa lên Drive.
-  5. Ghi cột split vào manifest.csv. Sau đó chạy import_manifest.py để nạp vào CSDL.
+  5. Ghi cột split vào manifest.csv.
 
 Chạy ở thư mục gốc dự án:  python data_tool/split.py
 Chạy lại được: data/web_split/ và data/combined/ do script này tạo ra, nên mỗi lần chạy được xóa và tạo lại từ đầu.
@@ -112,4 +112,4 @@ if __name__ == "__main__":
         if total < MIN_WEB_IMAGES:
             print(f"Cảnh báo: {flower} mới có {total} ảnh web, dưới {MIN_WEB_IMAGES}. Thêm từ khóa rồi chạy lại crawl.py, clean.py.")
 
-    print("\nTiếp theo: đưa data/combined.zip và data/web_test.zip lên Drive, rồi chạy python data_tool/import_manifest.py")
+    print("\nTiếp theo: đưa data/combined.zip và data/web_test.zip lên Drive.")

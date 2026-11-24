@@ -1,6 +1,3 @@
-/* Trang Chi tiết loài (/flowers/<id>). Người phụ trách: Nghi */
-
-// Lấy id trên thanh địa chỉ: "/flowers/3" -> "3"
 const flowerId = location.pathname.split('/').pop();
 
 function showFlower(flower) {
@@ -14,15 +11,10 @@ function showFlower(flower) {
   $('meaning').textContent = flower.meaning;
   $('season').textContent = flower.season;
 
-  // 3 ô ảnh mẫu: ô nào chưa có ảnh thì chỉ hiện khung sọc kèm chữ
   let html = '';
   for (let i = 0; i < 3; i++) {
     const src = flower.samples[i];
-    if (src) {
-      html += `<div class="stripe" style="--h:${flower.hue}"><img class="cover" src="${src}" alt="${flower.name_vi}"></div>`;
-    } else {
-      html += `<div class="stripe" style="--h:${flower.hue}"><span class="ph-label">[ ảnh mẫu dataset ]</span></div>`;
-    }
+    html += `<div class="stripe" style="--h:${flower.hue}"><img class="cover" src="${src}" alt="${flower.name_vi}"></div>`;
   }
   $('gallery').innerHTML = html;
 
