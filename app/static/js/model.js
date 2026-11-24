@@ -1,9 +1,3 @@
-/* Trang Mô hình: mọi con số đọc từ GET /api/model-info (models/model_info.json + tên tiếng Việt các lớp trong CSDL).
-   Số ảnh lấy từ num_images trong model_info.json: đúng những ảnh mô hình đang dùng đã học (train) và được chấm (val, test).
-   Không gõ số tay ở đây: thay mô hình mới chỉ cần thay file trong models/, trang tự đổi theo.
-   Người phụ trách: Nghi */
-
-// Cộng các giá trị của một object hoặc mảng: { daisy: 445, roses: 449 } -> 894;  [77, 8, 3] -> 88
 function sumValues(obj) {
   let total = 0;
   for (const value of Object.values(obj)) {
@@ -12,7 +6,6 @@ function sumValues(obj) {
   return total;
 }
 
-// ---------------- Số liệu chính ----------------
 function showStats(info) {
   const train = sumValues(info.num_images.train);
   const val = sumValues(info.num_images.val);
@@ -22,7 +15,6 @@ function showStats(info) {
   $('statAcc').textContent = formatPercent(info.test_accuracy, 1);
   $('statAccSub').textContent = `Mô hình ${info.version} · ${formatNumber(test)} ảnh test`;
 
-  // Số ảnh: tách riêng ảnh lớp "Khác" (nếu mô hình có lớp này)
   let other = 0;
   if (info.class_names.includes('other')) {
     other = info.num_images.train.other + info.num_images.val.other + info.num_images.test.other;
@@ -34,7 +26,6 @@ function showStats(info) {
     $('statImagesSub').textContent = `${formatNumber(all)} ảnh 5 loài hoa`;
   }
 
-  // Tỉ lệ chia tập, ví dụ "70/15/15"
   const trainPct = Math.round(train / all * 100);
   const valPct = Math.round(val / all * 100);
   const testPct = Math.round(test / all * 100);
@@ -42,14 +33,12 @@ function showStats(info) {
   $('statSplitSub').textContent = `train ${formatNumber(train)} · validation ${formatNumber(val)} · test ${formatNumber(test)}`;
 }
 
-// ---------------- Kiến trúc ----------------
-// layers: ["Input 180×180×3", "Rescaling 1/255", ..., "Softmax 5"]
 function showArchitecture(layers) {
   let html = '';
   for (let i = 0; i < layers.length; i++) {
     let style = '';
-    if (layers[i].startsWith('Conv')) style = 'background:#d3dccb';                   // khối Conv: xanh nhạt
-    if (i === layers.length - 1) style = 'background:var(--forest);color:#f5f3ec';   // lớp cuối: xanh đậm
+    if (layers[i].startsWith('Conv')) style = 'background:#d3dccb';
+    if (i === layers.length - 1) style = 'background:var(--forest);color:#f5f3ec';
 
     if (i > 0) html += '<span class="arrow">→</span>';
     html += `<span class="layer" style="${style}">${layers[i]}</span>`;
@@ -57,15 +46,13 @@ function showArchitecture(layers) {
   $('arch').innerHTML = html;
 }
 
-// ---------------- Quá trình huấn luyện (Chart.js) ----------------
-let chart = null;                                       // biểu đồ, tạo một lần rồi đổi dữ liệu
-let trainingHistory = null;                             // { accuracy: [...], val_accuracy: [...], loss: [...], val_loss: [...] }
+let chart = null;
+let trainingHistory = null;
 
 function showTrainingChart(info) {
   trainingHistory = info.history;
   $('epochInfo').textContent = `${info.epochs_trained} epoch · tốt nhất ở epoch ${info.best_epoch}`;
 
-  // Nhãn trục ngang: 1, 2, 3, ... số epoch
   const epochs = [];
   for (let i = 1; i <= trainingHistory.accuracy.length; i++) {
     epochs.push(i);
@@ -81,60 +68,53 @@ function showTrainingChart(info) {
       ],
     },
     options: {
-      interaction: { mode: 'index', intersect: false },   // rê chuột: hiện cả 2 đường của epoch đó
+      interaction: { mode: 'index', intersect: false },
       scales: { x: { title: { display: true, text: 'epoch' } } },
     },
   });
 }
 
-// type: 'accuracy' hoặc 'loss'
 function switchChart(type) {
   chart.data.datasets[0].data = trainingHistory[type];
   chart.data.datasets[1].data = trainingHistory['val_' + type];
   chart.update();
 
-  // Tô sáng nút đang chọn
   $('btnAccuracy').classList.toggle('active', type === 'accuracy');
   $('btnLoss').classList.toggle('active', type === 'loss');
 }
 
-// ---------------- Ma trận nhầm lẫn ----------------
-// matrix[r][c] = số ảnh thực tế là loài r mà mô hình đoán là loài c
 function showConfusionMatrix(matrix, names) {
-  let html = '<span></span>';                           // ô trống ở góc trên bên trái
+  let html = '<span></span>';
   for (const name of names) {
     html += `<span class="cm-head">${name}</span>`;
   }
 
   for (let r = 0; r < matrix.length; r++) {
     html += `<span class="cm-row-label">${names[r]}</span>`;
-    const rowTotal = sumValues(matrix[r]);              // tổng số ảnh của hàng
+    const rowTotal = sumValues(matrix[r]);
 
     for (let c = 0; c < matrix[r].length; c++) {
       const value = matrix[r][c];
-      const ratio = value / rowTotal;                   // tô màu theo TỈ LỆ trong hàng (các loài có số ảnh khác nhau)
+      const ratio = value / rowTotal;
 
       let background;
       let color = '#4d5a4f';
       if (r === c) {
-        background = `rgba(47, 74, 55, ${ratio})`;       // đường chéo = đoán đúng: xanh, càng nhiều càng đậm
+        background = `rgba(47, 74, 55, ${ratio})`;
         if (ratio > 0.5) color = '#f5f3ec';
       } else {
-        background = `rgba(201, 115, 79, ${ratio * 2})`;  // ngoài đường chéo = đoán nhầm: màu đất
+        background = `rgba(201, 115, 79, ${ratio * 2})`;
       }
       html += `<span class="cm-cell" style="background:${background};color:${color}" title="${formatPercent(ratio, 1)} của hàng">${value}</span>`;
     }
   }
-  $('cm').style.setProperty('--n', names.length);       // số cột của lưới (5 loài hoa + Khác = 6)
+  $('cm').style.setProperty('--n', names.length);
   $('cm').innerHTML = html;
 }
 
-// ---------------- Số ảnh theo lớp ----------------
-// Mỗi lớp một thanh gồm 3 đoạn: train (đậm), validation, test (nhạt)
 function showImageCounts(info, names) {
-  const counts = info.num_images;                       // { train: { daisy: 445, ... }, val: {...}, test: {...} }
+  const counts = info.num_images;
 
-  // Lớp nhiều ảnh nhất có thanh dài 100%
   let max = 1;
   for (const code of info.class_names) {
     const total = counts.train[code] + counts.val[code] + counts.test[code];
@@ -161,11 +141,10 @@ function showImageCounts(info, names) {
   $('counts').innerHTML = html;
 }
 
-// ---------------- F1 theo loài ----------------
 function showF1(info, names) {
   let html = '';
   for (let i = 0; i < info.class_names.length; i++) {
-    const scores = info.per_class[info.class_names[i]];   // { precision, recall, f1 }
+    const scores = info.per_class[info.class_names[i]];
     html += `
       <div class="cmp-row" title="precision ${formatPercent(scores.precision, 1)} · recall ${formatPercent(scores.recall, 1)}">
         <span class="cmp-name">${names[i]}</span>
@@ -177,12 +156,10 @@ function showF1(info, names) {
   $('f1Legend').textContent = `Mô hình ${info.version} · độ chính xác ${formatPercent(info.test_accuracy, 1)}`;
 }
 
-// ---------------- Tải dữ liệu ----------------
 async function loadModelInfo() {
   try {
     const info = await callApi('/api/model-info');
 
-    // Tên tiếng Việt các loài, đúng thứ tự class_names (máy chủ đã sắp sẵn info.flowers theo thứ tự đó)
     const names = [];
     for (const flower of info.flowers) {
       names.push(flower.name_vi);
@@ -194,7 +171,7 @@ async function loadModelInfo() {
     showImageCounts(info, names);
     showF1(info, names);
     show('content');
-    showTrainingChart(info);                            // vẽ sau khi khối đã hiện, để Chart.js đo đúng kích thước
+    showTrainingChart(info);
   } catch (error) {
     showLoadError('Không tải được thông tin mô hình. ' + error.message);
   }

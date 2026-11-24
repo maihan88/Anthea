@@ -1,5 +1,4 @@
 <!doctype html>
-<!-- Lịch sử dự đoán. Dữ liệu từ GET /api/history, xóa bằng DELETE (history.js). Người phụ trách: Nghi -->
 <html lang="vi">
 <head>
   <meta charset="utf-8">
@@ -13,7 +12,6 @@
   <link rel="icon" type="image/png" href="/static/img/favicon.png">
 </head>
 <body>
-  <!-- ============ HEADER ============ -->
   <header class="site-header">
     <div class="wrap">
       <a class="brand" href="/">
@@ -35,14 +33,12 @@
       <div class="d-flex justify-content-between align-items-end flex-wrap" style="gap:20px">
         <div class="d-flex flex-column gap-2">
           <span id="countLabel" class="eyebrow" style="font-weight:600;color:var(--ink-3)">Đang tải…</span>
-          <!-- <h1 class="page-title" style="font-size:clamp(40px,5vw,62px)">Nhật ký <em>vườn hoa</em></h1> -->
         </div>
         <button id="btnClearAll" type="button" class="btn btn-del-all d-none">Xóa toàn bộ</button>
       </div>
 
       <div id="loadError" class="upload-error load-error d-none"><span class="notice-icon">!</span><span id="loadErrorText"></span></div>
 
-      <!-- ============ BẢNG LỊCH SỬ ============ -->
       <div id="historyWrap" class="history-card d-none">
         <div class="table-responsive">
           <table class="table table-hover history-table">
@@ -55,13 +51,11 @@
                 <th></th>
               </tr>
             </thead>
-            <!-- history.js điền các dòng vào đây -->
             <tbody id="historyBody"></tbody>
           </table>
         </div>
       </div>
 
-      <!-- ============ CHƯA CÓ LỊCH SỬ (hiện khi danh sách trống) ============ -->
       <div id="emptyState" class="empty-state d-none">
         <svg viewBox="0 0 200 200" width="72" height="72">
           <g fill="none" stroke="#2f4a37" stroke-opacity=".55" stroke-width="5">
@@ -79,7 +73,6 @@
     </section>
   </main>
 
-  <!-- ============ HỘP XÁC NHẬN XÓA (Bootstrap modal, mở bằng askConfirm() trong common.js) ============ -->
   <div class="modal fade" id="confirmModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered" style="max-width:440px">
       <div class="modal-content anthea-modal">
@@ -93,11 +86,9 @@
     </div>
   </div>
 
-  <!-- ============ FOOTER ============ -->
   <footer class="site-footer">
     <div class="wrap">
       <span><em>Anthea</em> — nhận diện hoa bằng CNN</span>
-      <!-- <span class="mono" style="font-size:12px">TensorFlow · Keras · Flask · MySQL</span> -->
     </div>
   </footer>
 

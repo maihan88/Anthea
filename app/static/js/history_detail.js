@@ -1,34 +1,29 @@
-/* Trang Chi tiết lịch sử (/history/<id>). Người phụ trách: Nghi */
-
-// Lấy id trên thanh địa chỉ: "/history/12" -> "12"
 const predictionId = location.pathname.split('/').pop();
 
 function showPrediction(item) {
   const flower = item.flower;
   document.title = flower.name_vi + ' #' + item.id + ' · Anthea';
 
-  // Cột trái: ảnh + thông tin
   $('imageBox').style.setProperty('--h', flower.hue);
   $('image').src = item.image_url;
   $('image').alt = 'Ảnh đã tải lên: ' + item.original_name;
   $('metaTime').textContent = formatDateTime(item.created_at);
   $('metaFile').textContent = item.original_name;
   $('metaSize').textContent = formatSize(item.file_size);
-  $('metaModel').textContent = item.model_version;       // phiên bản LÚC phân loại, không phải bản hiện tại
+  $('metaModel').textContent = item.model_version;
   $('metaThreshold').textContent = formatPercent(item.threshold);
 
-  // Cột phải: kết quả
   $('dot').style.setProperty('--h', flower.hue);
   $('nameVi').textContent = flower.name_vi;
   if (flower.code === 'other') {
-    $('nameEn').textContent = 'Không thuộc 5 loài Anthea nhận diện';   // lớp "Khác": không có tên khoa học
+    $('nameEn').textContent = 'Không thuộc 5 loài Anthea nhận diện';
   } else {
     $('nameEn').textContent = flower.name_en + ' · ' + flower.scientific;
   }
   $('pct').textContent = formatPercent(item.confidence);
   $('top3').innerHTML = top3Html(item.top, item.uncertain);
   $('flowerLink').href = '/flowers/' + flower.id;
-  if (flower.code === 'other') hide('flowerLink');       // lớp "Khác" không có trang thông tin loài
+  if (flower.code === 'other') hide('flowerLink');
 
   if (item.uncertain) {
     $('pct').classList.add('low');
@@ -44,7 +39,7 @@ async function loadPrediction() {
     show('detail');
   } catch (error) {
     if (error.status === 404) {
-      show('notFound');                                  // id sai hoặc mục đã bị xóa
+      show('notFound');
     } else {
       showLoadError('Không tải được mục này. ' + error.message);
     }
@@ -57,12 +52,12 @@ function deleteThis() {
     try {
       await callApi('/api/history/' + predictionId, 'DELETE');
     } catch (error) {
-      if (error.status !== 404) {                       // 404 = đã bị xóa từ trước, coi như xong
+      if (error.status !== 404) {
         showLoadError('Chưa xóa được. ' + error.message);
         return;
       }
     }
-    location.href = '/history';                          // xóa xong thì quay về danh sách
+    location.href = '/history';
   });
 }
 

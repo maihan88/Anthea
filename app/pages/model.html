@@ -1,6 +1,4 @@
 <!doctype html>
-<!-- Thông tin mô hình. Mọi con số lấy từ GET /api/model-info (model.js), không gõ số tay ở đây.
-     Người phụ trách: Nghi -->
 <html lang="vi">
 <head>
   <meta charset="utf-8">
@@ -14,7 +12,6 @@
   <link rel="icon" type="image/png" href="/static/img/favicon.png">
 </head>
 <body>
-  <!-- ============ HEADER ============ -->
   <header class="site-header">
     <div class="wrap">
       <a class="brand" href="/">
@@ -36,7 +33,6 @@
       <div class="d-flex justify-content-between align-items-end flex-wrap" style="gap:24px">
         <div class="d-flex flex-column gap-2">
           <span class="eyebrow">Mô hình &amp; dữ liệu</span>
-          <!-- <h1 class="page-title">Bên trong <em>Anthea</em></h1> -->
         </div>
       </div>
 
@@ -44,7 +40,6 @@
       <div id="loadError" class="upload-error load-error d-none"><span class="notice-icon">!</span><span id="loadErrorText"></span></div>
 
       <div id="content" class="d-flex flex-column d-none" style="gap:28px">
-        <!-- ============ SỐ LIỆU CHÍNH ============ -->
         <div class="row g-3">
           <div class="col-md-4">
             <div class="stat dark">
@@ -69,14 +64,12 @@
           </div>
         </div>
 
-        <!-- ============ KIẾN TRÚC CNN ============ -->
         <div class="box" style="padding:24px 28px;gap:16px">
           <span class="stat-label">Kiến trúc CNN</span>
           <div id="arch" class="arch"></div>
         </div>
 
         <div class="row g-4">
-          <!-- ============ QUÁ TRÌNH HUẤN LUYỆN (vẽ bằng Chart.js) ============ -->
           <div class="col-lg-6">
             <div class="box" style="gap:20px">
               <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
@@ -93,7 +86,6 @@
             </div>
           </div>
 
-          <!-- ============ MA TRẬN NHẦM LẪN ============ -->
           <div class="col-lg-6">
             <div class="box" style="gap:20px">
               <div class="d-flex justify-content-between align-items-baseline flex-wrap gap-2">
@@ -104,7 +96,6 @@
             </div>
           </div>
 
-          <!-- ============ SỐ ẢNH THEO LOÀI ============ -->
           <div class="col-lg-6">
             <div class="box">
               <div class="box-title">Số ảnh theo lớp</div>
@@ -117,7 +108,6 @@
             </div>
           </div>
 
-          <!-- ============ F1 THEO LOÀI ============ -->
           <div class="col-lg-6">
             <div class="box">
               <div class="d-flex justify-content-between align-items-baseline flex-wrap gap-2">
@@ -135,15 +125,12 @@
     </section>
   </main>
 
-  <!-- ============ FOOTER ============ -->
   <footer class="site-footer">
     <div class="wrap">
       <span><em>Anthea</em> — nhận diện hoa bằng CNN</span>
-      <!-- <span class="mono" style="font-size:12px">TensorFlow · Keras · Flask · MySQL</span> -->
     </div>
   </footer>
 
-  <!-- Chart.js: thư viện vẽ biểu đồ, dùng cho "Quá trình huấn luyện" -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
   <script src="/static/js/common.js"></script>
   <script src="/static/js/model.js"></script>

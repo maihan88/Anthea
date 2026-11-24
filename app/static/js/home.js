@@ -1,10 +1,6 @@
-/* Trang chủ: mục "Nhận diện gần đây" = 4 lần phân loại mới nhất. Người phụ trách: Nghi
-   Hero và khối "Ba bước" là phần minh họa, viết sẵn trong index.html. */
-
-// HTML một thẻ "gần đây". item là một mục của GET /api/history
 function recentCardHtml(item) {
   let pctClass = 'recent-pct';
-  if (item.uncertain) pctClass = 'recent-pct low';     // dưới ngưỡng: số màu cam
+  if (item.uncertain) pctClass = 'recent-pct low';
 
   return `
     <div class="col-md-6 col-lg-4 col-xl-3">
@@ -26,7 +22,7 @@ function recentCardHtml(item) {
 async function loadRecent() {
   try {
     const data = await callApi('/api/history?limit=4');
-    if (data.items.length === 0) return;                // chưa có lịch sử: giữ mục này ẩn
+    if (data.items.length === 0) return;
 
     let html = '';
     for (const item of data.items) {
@@ -35,7 +31,6 @@ async function loadRecent() {
     $('recentList').innerHTML = html;
     show('recentSection');
   } catch (error) {
-    // Đây chỉ là mục phụ: lỗi thì cứ để ẩn, ghi lỗi ra Console (F12) để xem
     console.warn('Không tải được nhận diện gần đây:', error.message);
   }
 }

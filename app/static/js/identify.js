@@ -1,21 +1,10 @@
-/* Trang Nhận diện: chọn ảnh → phân loại → hiện kết quả. Người phụ trách: Nghi
-   Trang có 4 trạng thái, mọi khối đều viết sẵn trong identify.html:
-     empty     : chưa có ảnh (khung kéo-thả + mẹo chụp ảnh)
-     chosen    : đã chọn ảnh, chờ bấm "Phân loại"
-     analyzing : đang gửi ảnh lên máy chủ
-     result    : có kết quả */
-
-const MAX_SIZE = 5 * 1024 * 1024;                       // 5 MB
+const MAX_SIZE = 5 * 1024 * 1024;
 const ALLOWED_TYPES = ['image/jpeg', 'image/png'];
-// 4 bước hiện trong lúc chờ, khớp kiến trúc mô hình (models/model_info.json → architecture)
 const STEPS = ['Resize 180×180 · chuẩn hoá 0–1', '4 khối Conv · trích đặc trưng', 'GlobalAveragePooling', 'Softmax · 5 loài hoa + Khác'];
-const OTHER_CODE = 'other';                             // lớp "Khác" của mô hình: không phải hoa, hoặc hoa ngoài 5 loài
+const OTHER_CODE = 'other';
 
-let currentFile = null;                                 // ảnh đang chọn
+let currentFile = null;
 
-// ---------------- Chuyển trạng thái ----------------
-
-// visible = true thì hiện, false thì ẩn
 function setVisible(id, visible) {
   if (visible) show(id);
   else hide(id);
@@ -23,7 +12,7 @@ function setVisible(id, visible) {
 
 function setState(state) {
   setVisible('dropZone', state === 'empty');
-  setVisible('sideCol', state !== 'empty');             // chưa chọn ảnh: chỉ còn khung ảnh ở giữa
+  setVisible('sideCol', state !== 'empty');
   setVisible('imageBox', state !== 'empty');
   setVisible('previewBar', state === 'chosen');
   setVisible('analyzing', state === 'analyzing');
@@ -33,7 +22,6 @@ function setState(state) {
   setVisible('aboutSection', state === 'result');
 }
 
-// Quay về màn hình trống
 function reset() {
   currentFile = null;
   $('previewImg').removeAttribute('src');
@@ -42,14 +30,11 @@ function reset() {
   setState('empty');
 }
 
-// Ảnh không hợp lệ: quay về màn hình trống, báo lỗi trong khung kéo-thả
 function showDropError(message) {
   reset();
   $('dropErrorText').textContent = message;
   show('dropError');
 }
-
-// ---------------- Chọn ảnh ----------------
 
 function chooseFile(file) {
   if (!file) return;
@@ -65,14 +50,13 @@ function chooseFile(file) {
   currentFile = file;
   hide('dropError');
   hide('predictError');
-  $('previewImg').src = URL.createObjectURL(file);      // xem trước ảnh ngay trên trình duyệt
+  $('previewImg').src = URL.createObjectURL(file);
   $('previewName').textContent = file.name;
   $('previewSize').textContent = formatSize(file.size);
   $('fileTagName').textContent = file.name;
   setState('chosen');
 }
 
-// Nút "Thử với ảnh mẫu": lấy ngẫu nhiên một ảnh trong app/static/samples/<mã loài>/
 async function pickSample() {
   try {
     const flowers = await callApi('/api/flowers');
@@ -87,7 +71,7 @@ async function pickSample() {
 
     const url = samples[Math.floor(Math.random() * samples.length)];
     const response = await fetch(url);
-    const blob = await response.blob();                 // nội dung ảnh
+    const blob = await response.blob();
     const fileName = url.split('/').pop();
     chooseFile(new File([blob], fileName, { type: blob.type }));
   } catch (error) {
@@ -95,16 +79,12 @@ async function pickSample() {
   }
 }
 
-// ---------------- Phân loại ----------------
-
-// Chờ ms mili-giây (dùng với await)
 function wait(ms) {
   return new Promise(function (resolve) {
     setTimeout(resolve, ms);
   });
 }
 
-// Tô màu bước thứ `step` (0..3): các bước trước là "done", bước này là "current"
 function showStep(step) {
   let html = '';
   for (let i = 0; i < STEPS.length; i++) {
@@ -118,11 +98,10 @@ function showStep(step) {
   }
   $('stepList').innerHTML = html;
 
-  // 20% → 80%: chưa bao giờ hiện 100% khi máy chủ chưa trả kết quả
   const percent = (step + 1) * 20;
   $('analyzePct').textContent = percent + '%';
   $('progressBar').style.width = percent + '%';
-  $('scanLine').style.top = (percent * 0.9) + '%';      // vạch quét chạy dần xuống dưới ảnh
+  $('scanLine').style.top = (percent * 0.9) + '%';
   $('stepLabel').textContent = STEPS[step];
 }
 
@@ -131,24 +110,21 @@ async function classify() {
   hide('predictError');
   setState('analyzing');
 
-  // Gửi ảnh lên máy chủ. Chưa "await" ngay, để hiệu ứng bên dưới chạy trong lúc chờ.
   const formData = new FormData();
   formData.append('image', currentFile);
   const request = callApi('/api/predict', 'POST', formData);
 
-  // Hiệu ứng: 3 bước đầu, mỗi bước 0,3 giây
   const lastStep = STEPS.length - 1;
   for (let step = 0; step < lastStep; step++) {
     showStep(step);
     await wait(300);
   }
-  // Bước cuối đứng "đang chạy" (nhấp nháy) cho tới khi máy chủ trả kết quả
   showStep(lastStep);
 
   try {
-    const data = await request;                          // giờ mới chờ kết quả
+    const data = await request;
     setState('result');
-    showResult(data);                                    // sau setState, vì kết quả "Khác" cần ẩn bớt vài khối
+    showResult(data);
   } catch (error) {
     setState('chosen');
     $('predictErrorText').textContent = error.message;
@@ -156,9 +132,8 @@ async function classify() {
   }
 }
 
-// data là kết quả của POST /api/predict: { top: [3 loài], threshold, uncertain, history_id }
 function showResult(data) {
-  const best = data.top[0];                              // loài có độ tin cậy cao nhất
+  const best = data.top[0];
 
   $('resName').textContent = best.name_vi;
   $('resPct').textContent = formatPercent(best.confidence);
@@ -166,12 +141,10 @@ function showResult(data) {
   $('resHistLink').href = '/history/' + data.history_id;
   $('fileTagDot').style.setProperty('--h', best.hue);
 
-  // Ẩn hết các khối thông báo của lần trước, rồi chỉ hiện khối đúng với kết quả lần này
   hide('resOther');
   hide('resUnsure');
   $('resPct').classList.remove('low');
 
-  // Trường hợp 1: mô hình đoán "Khác" -> báo không phải hoa cần nhận diện, không có thông tin loài để xem
   if (best.code === OTHER_CODE) {
     $('resEn').textContent = 'Không thuộc 5 loài Anthea nhận diện';
     show('resOther');
@@ -180,19 +153,16 @@ function showResult(data) {
     return;
   }
 
-  // Trường hợp 2: là một trong 5 loài hoa
   $('resEn').textContent = best.name_en + ' · ' + best.scientific;
   $('resLink').href = '/flowers/' + best.id;
   show('resLink');
 
-  // Dưới ngưỡng: số màu cam + khối "Chưa chắc chắn"
   if (data.uncertain) {
     $('resPct').classList.add('low');
     $('resThreshold').textContent = formatPercent(data.threshold);
     show('resUnsure');
   }
 
-  // Khối "Về loài hoa này"
   $('aboutName').innerHTML = `${best.name_vi} <em>— ${best.name_en}</em>`;
   $('aboutDesc').textContent = best.description;
   $('aboutMeaning').textContent = best.meaning;
@@ -201,19 +171,13 @@ function showResult(data) {
   let html = '';
   for (let i = 0; i < 3; i++) {
     const src = best.samples[i];
-    if (src) {
-      html += `<div class="stripe" style="--h:${best.hue}"><img class="cover" src="${src}" alt=""></div>`;
-    } else {
-      html += `<div class="stripe" style="--h:${best.hue}"><span class="ph-label">[ mẫu ${i + 1} ]</span></div>`;
-    }
+    html += `<div class="stripe" style="--h:${best.hue}"><img class="cover" src="${src}" alt=""></div>`;
   }
   $('aboutGallery').innerHTML = html;
 }
 
-// ---------------- Gắn sự kiện cho các nút ----------------
-
 $('btnPick').onclick = function () {
-  $('fileInput').click();                               // mở hộp chọn file của máy
+  $('fileInput').click();
 };
 $('btnSample').onclick = pickSample;
 $('btnOther').onclick = reset;
@@ -222,20 +186,17 @@ $('btnClassify').onclick = classify;
 
 $('fileInput').onchange = function () {
   chooseFile($('fileInput').files[0]);
-  $('fileInput').value = '';                            // để chọn lại đúng file đó vẫn nhận
+  $('fileInput').value = '';
 };
-
-// ---------------- Kéo & thả ảnh ----------------
 
 const dropZone = $('dropZone');
 
 dropZone.addEventListener('dragover', function (event) {
-  event.preventDefault();                               // bắt buộc, nếu không sự kiện "drop" sẽ không chạy
+  event.preventDefault();
   dropZone.classList.add('dragover');
 });
 
 dropZone.addEventListener('dragleave', function (event) {
-  // Rê qua phần tử con bên trong khung cũng sinh "dragleave": chỉ bỏ hiệu ứng khi rời hẳn khung
   if (!dropZone.contains(event.relatedTarget)) dropZone.classList.remove('dragover');
 });
 
@@ -245,6 +206,5 @@ dropZone.addEventListener('drop', function (event) {
   chooseFile(event.dataTransfer.files[0]);
 });
 
-// Thả ảnh lệch ra ngoài khung thì trình duyệt không tự mở ảnh đó
 window.addEventListener('dragover', function (event) { event.preventDefault(); });
 window.addEventListener('drop', function (event) { event.preventDefault(); });

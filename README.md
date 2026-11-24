@@ -60,7 +60,7 @@ TensorFlow nặng vài trăm MB, nên dùng mạng ổn định. `requirements.t
 Copy-Item .env.example .env
 ```
 
-Mở `.env`, điền `DB_USER` và `DB_PASSWORD` là tài khoản MySQL tạo ở mục **Chạy web** bước 1 (không dùng `root`). Giữ `USE_FAKE_MODEL=0` để web dùng mô hình thật `models/flower_cnn.keras`.
+Mở `.env`, điền `DB_USER` và `DB_PASSWORD` là tài khoản MySQL tạo ở mục **Chạy web** bước 1 (không dùng `root`).
 
 File `.env` chứa mật khẩu nên **không bao giờ đẩy lên GitHub** (đã có trong `.gitignore`).
 
@@ -120,12 +120,14 @@ Chạy lại bao nhiêu lần cũng được. Mỗi máy một CSDL riêng: lị
 2. Ở trang **Dashboard**, chép dòng **API environment variable**, dạng `cloudinary://<api_key>:<api_secret>@<cloud_name>`.
 3. Dán vào `.env` thành một dòng `CLOUDINARY_URL=cloudinary://...` (chỉ một chữ `CLOUDINARY_URL=` ở đầu dòng).
 
-Để trống `CLOUDINARY_URL` thì web vẫn chạy, ảnh tạm lưu vào `app/static/uploads/`. Ảnh trên Cloudinary nằm trong thư mục `anthea/uploads`; CSDL chỉ lưu đường link (`image_url`) và mã ảnh (`image_id`, dùng khi xóa).
+Web cần `CLOUDINARY_URL` và mạng Internet mới nhận diện được, vì ảnh nào cũng được lưu lên Cloudinary. Ảnh trên Cloudinary nằm trong thư mục `anthea/uploads`; CSDL chỉ lưu đường link (`image_url`) và mã ảnh (`image_id`, dùng khi xóa).
 
-**Máy đã chạy bản cũ** (bảng `predictions` còn cột `image_path`): `seed.py` không tự sửa bảng đã có, nên chạy một lần trong MySQL Workbench rồi chạy lại `python app/seed.py`. Lệnh này xóa toàn bộ lịch sử phân loại cũ:
+**Máy đã chạy bản cũ** (còn bảng `dataset_images` hoặc cột `flowers.in_model`): `seed.py` không tự sửa bảng đã có, nên chạy một lần trong MySQL Workbench. Lịch sử phân loại vẫn giữ nguyên:
 
 ```sql
-DROP TABLE prediction_scores, predictions;
+USE flower_db;
+DROP TABLE IF EXISTS dataset_images;
+ALTER TABLE flowers DROP COLUMN in_model;
 ```
 
 ### 4. Chạy web

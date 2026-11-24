@@ -1,7 +1,4 @@
 <!doctype html>
-<!-- Nhận diện: tải ảnh lên để phân loại. Người phụ trách: Nghi
-     Trang có 4 trạng thái: empty (chưa có ảnh) → chosen (đã chọn ảnh) → analyzing (đang phân tích) → result (kết quả).
-     Mọi khối đều có sẵn ở đây; identify.js chỉ ẩn/hiện bằng class "d-none" và điền dữ liệu. -->
 <html lang="vi">
 <head>
   <meta charset="utf-8">
@@ -15,7 +12,6 @@
   <link rel="icon" type="image/png" href="/static/img/favicon.png">
 </head>
 <body>
-  <!-- ============ HEADER ============ -->
   <header class="site-header">
     <div class="wrap">
       <a class="brand" href="/">
@@ -37,59 +33,48 @@
       <div class="d-flex justify-content-between align-items-end flex-wrap" style="gap:24px">
         <div class="d-flex flex-column gap-2">
           <span class="eyebrow">Nhận diện</span>
-          <!-- <h1 class="page-title">Bông hoa này là gì?</h1> -->
         </div>
       </div>
 
-      <!-- justify-content-center: lúc chưa chọn ảnh chỉ có khung ảnh, nằm giữa trang -->
       <div class="row g-4 justify-content-center">
-        <!-- ============ CỘT TRÁI: KHUNG ẢNH ============ -->
         <div class="col-lg-6">
           <div class="upload-card h-100">
             <input id="fileInput" type="file" accept="image/jpeg,image/png" hidden>
 
-            <!-- Trạng thái empty: khung kéo-thả -->
             <div id="dropZone" class="drop-zone">
               <div class="drop-icon">
                 <span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="M6 11l6-6 6 6"/></svg></span>
               </div>
               <div class="d-flex flex-column gap-1">
                 <div class="drop-title">Kéo &amp; thả ảnh hoa vào đây</div>
-                <!-- <div class="drop-hint">Ảnh rõ nét, bông hoa nằm giữa khung cho kết quả tốt nhất</div> -->
               </div>
               <div class="d-flex gap-2 flex-wrap justify-content-center">
                 <button id="btnPick" type="button" class="btn btn-forest">Chọn ảnh từ máy</button>
                 <button id="btnSample" type="button" class="btn btn-line">Thử với ảnh mẫu</button>
               </div>
               <div class="mono" style="font-size:12px;color:var(--ink-5)">JPG · PNG — tối đa 5 MB</div>
-              <!-- Báo lỗi: sai định dạng, ảnh quá nặng… -->
               <div id="dropError" class="upload-error d-none">
                 <span class="notice-icon">!</span><span id="dropErrorText"></span>
               </div>
               <div class="drop-overlay">Thả ảnh để bắt đầu</div>
             </div>
 
-            <!-- Trạng thái chosen / analyzing / result: khung ảnh -->
             <div id="imageBox" class="image-box stripe d-none" style="--h:140">
               <img id="previewImg" class="cover" alt="Ảnh hoa vừa chọn">
-              <!-- Lớp phủ khi đang phân tích -->
               <div id="analyzing" class="analyzing d-none">
                 <div id="scanLine" class="scan-line"></div>
                 <div class="analyzing-title">Đang nhìn kỹ từng cánh hoa…</div>
                 <div id="stepLabel" class="analyzing-step"></div>
                 <div class="analyzing-track"><div id="progressBar" class="analyzing-bar"></div></div>
               </div>
-              <!-- Tên file, hiện cùng kết quả -->
               <div id="fileTag" class="file-tag d-none"><span id="fileTagDot" class="dot"></span><span id="fileTagName"></span></div>
             </div>
           </div>
         </div>
 
-        <!-- ============ CỘT PHẢI: KẾT QUẢ (ẩn khi chưa chọn ảnh) ============ -->
         <div id="sideCol" class="col-lg-6 d-none">
           <div class="side-panel h-100">
 
-            <!-- Trạng thái chosen: tên ảnh + nút Phân loại -->
             <div id="previewBar" class="preview-bar p-0 d-none">
               <div class="flex-grow-1 d-flex flex-column gap-1" style="min-width:160px">
                 <div id="previewName" class="preview-name"></div>
@@ -99,12 +84,10 @@
               <button id="btnClassify" type="button" class="btn btn-forest" style="--bs-btn-padding-x:26px">Phân loại</button>
             </div>
 
-            <!-- Báo lỗi khi gọi /api/predict -->
             <div id="predictError" class="upload-error m-0 d-none">
               <span class="notice-icon">!</span><span id="predictErrorText"></span>
             </div>
 
-            <!-- Trạng thái analyzing: 4 bước (identify.js vẽ danh sách) -->
             <div id="analyzePanel" class="d-flex flex-column d-none" style="gap:18px">
               <div class="d-flex justify-content-between align-items-baseline">
                 <span class="eyebrow">Đang phân tích</span>
@@ -113,7 +96,6 @@
               <ol id="stepList" class="a-steps"></ol>
             </div>
 
-            <!-- Trạng thái result: kết quả -->
             <div id="result" class="d-flex flex-column d-none" style="gap:20px">
               <div class="d-flex justify-content-between align-items-end gap-3 flex-wrap">
                 <div class="d-flex flex-column gap-1">
@@ -122,22 +104,18 @@
                   <div id="resEn" class="result-en"></div>
                 </div>
                 <div class="text-end">
-                  <!-- Dưới ngưỡng: JS thêm class "low" -->
                   <div id="resPct" class="result-pct"></div>
                   <div style="font-size:12px;color:var(--ink-5);margin-top:4px">độ tin cậy</div>
                 </div>
               </div>
-              <!-- Chỉ hiện khi mô hình đoán là lớp "Khác" -->
               <div id="resOther" class="notice d-none">
                 <span class="notice-icon">!</span>
                 <div><strong style="font-weight:600">Không phải hoa cần nhận diện.</strong> Ảnh này không phải hoa, hoặc là hoa ngoài 5 loài Anthea đã học (cúc họa mi, bồ công anh, hoa hồng, hướng dương, tulip).</div>
               </div>
-              <!-- Chỉ hiện khi độ tin cậy dưới ngưỡng -->
               <div id="resUnsure" class="notice d-none">
                 <span class="notice-icon">?</span>
                 <div><strong style="font-weight:600">Chưa chắc chắn.</strong> Độ tin cậy thấp hơn <span id="resThreshold"></span> — ảnh có thể không thuộc 5 loài Anthea đã học. Hãy thử ảnh rõ hơn, chụp gần bông hoa.</div>
               </div>
-              <!-- 3 thanh top 3 -->
               <div id="resTop3" class="d-flex flex-column gap-2"></div>
               <div class="saved-row">
                 <span class="saved-check">✓</span>Đã lưu vào lịch sử
@@ -154,7 +132,6 @@
       </div>
     </section>
 
-    <!-- ============ VỀ LOÀI HOA NÀY (hiện cùng kết quả) ============ -->
     <section id="aboutSection" class="wrap d-none" style="padding-top:16px;padding-bottom:72px">
       <div class="about">
         <div class="row g-4 g-lg-5">
@@ -172,7 +149,6 @@
           </div>
           <div class="col-md-6 d-flex flex-column gap-3">
             <span class="about-label">Ảnh mẫu từ bộ dữ liệu</span>
-            <!-- identify.js điền 3 ô ảnh mẫu vào đây -->
             <div id="aboutGallery" class="about-gallery"></div>
           </div>
         </div>
@@ -180,11 +156,9 @@
     </section>
   </main>
 
-  <!-- ============ FOOTER ============ -->
   <footer class="site-footer">
     <div class="wrap">
       <span><em>Anthea</em> — nhận diện hoa bằng CNN</span>
-      <!-- <span class="mono" style="font-size:12px">TensorFlow · Keras · Flask · MySQL</span> -->
     </div>
   </footer>
 

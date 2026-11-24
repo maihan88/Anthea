@@ -11,9 +11,6 @@ __pycache__/
 data/
 *.zip
 
-# Ảnh người dùng tải lên khi chạy web (vẫn giữ thư mục rỗng)
-app/static/uploads/*
-!app/static/uploads/.gitkeep
 
 # File của hệ điều hành và VS Code
 Thumbs.db
